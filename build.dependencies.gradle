@@ -4,6 +4,8 @@ repositories {
 
     maven { url = 'https://maven.pedropathing.com' }
     maven { url = "https://mymaven.bylazar.com/releases" }
+    maven { url = "https://repo.dairy.foundation/releases"}
+    maven { url = "https://repo.dairy.foundation/snapshots"}
 }
 
 dependencies {
@@ -19,6 +21,8 @@ dependencies {
 
     //added
     implementation 'com.pedropathing:ftc:2.0.0'
+    implementation "org.solverslib:core:SNAPSHOT-7cdcc66" // core
+    implementation "org.solverslib:pedroPathing:SNAPSHOT-7cdcc66"
     implementation 'com.pedropathing:telemetry:0.0.6'
     implementation 'com.bylazar:fullpanels:1.0.2'
 
