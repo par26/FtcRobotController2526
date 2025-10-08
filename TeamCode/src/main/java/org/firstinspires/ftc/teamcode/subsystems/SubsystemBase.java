@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.Subsystem;
 
-public class SubsystemBase implements Subsystem {
+public abstract class SubsystemBase implements Subsystem {
     protected String m_name = this.getClass().getSimpleName();
 
     public SubsystemBase() {
@@ -27,4 +27,5 @@ public class SubsystemBase implements Subsystem {
         setName(subsystem);
     }
 
+    public abstract void perodic();
 }
