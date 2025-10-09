@@ -27,7 +27,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void perodic() {
+    public void periodic() {
         follower.update();
     }
 

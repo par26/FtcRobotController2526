@@ -27,5 +27,5 @@ public abstract class SubsystemBase implements Subsystem {
         setName(subsystem);
     }
 
-    public abstract void perodic();
+    public abstract void periodic();
 }

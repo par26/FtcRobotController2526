@@ -15,37 +15,34 @@ public class TeleOp extends CommandOpMode {
 
     private GamepadEx m_driver;
     private DriveSubsystem m_drive;
-    private Telemetry telemetry;
 
     @Override
     public void initialize() {
         m_driver = new GamepadEx(gamepad1);
         m_drive = new DriveSubsystem(hardwareMap);
+        register(m_drive);
 
         schedule(new InstantCommand(m_drive::startTeleOp, m_drive));
-
-        telemetry.addLine("Hello");
 
         m_drive.setDefaultCommand(
                 new RunCommand(() ->
                         m_drive.drive(
-                                m_driver.getLeftY(),
+                                -m_driver.getLeftY(),
                                 m_driver.getLeftX(),
                                 m_driver.getRightX(),
                                 true
                         ), m_drive));
+//
+//        m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+//                .whileHeld(new RunCommand(() ->
+//                        m_drive.drive(
+//                                0.5*m_driver.getLeftX(),
+//                                0.5*m_driver.getLeftY(),
+//                                0.5*m_driver.getRightX(),
+//                            true
+//                        ), m_drive))
+//                .whenReleased(new InstantCommand(m_drive::stop, m_drive));
 
-        m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whileHeld(new RunCommand(() ->
-                        m_drive.drive(
-                                0.5*m_driver.getLeftX(),
-                                0.5*m_driver.getLeftY(),
-                                0.5*m_driver.getRightX(),
-                            true
-                        ), m_drive))
-                .whenReleased(new InstantCommand(m_drive::stop, m_drive));
-
-        register(m_drive);
     }
 
 
