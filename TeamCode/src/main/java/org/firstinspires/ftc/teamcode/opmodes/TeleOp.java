@@ -27,9 +27,9 @@ public class TeleOp extends CommandOpMode {
         m_drive.setDefaultCommand(
                 new RunCommand(() ->
                         m_drive.drive(
-                                -m_driver.getLeftY(),
-                                m_driver.getLeftX(),
-                                m_driver.getRightX(),
+                                m_driver.getLeftY(),
+                                -m_driver.getLeftX(),
+                                -m_driver.getRightX(),
                                 true
                         ), m_drive));
 //
