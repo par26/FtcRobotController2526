@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.Robot;
@@ -9,18 +10,21 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.TrollSubsystem;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class TeleOp extends CommandOpMode {
 
     private GamepadEx m_driver;
     private DriveSubsystem m_drive;
+    private TrollSubsystem m_troll;
 
     @Override
     public void initialize() {
         m_driver = new GamepadEx(gamepad1);
         m_drive = new DriveSubsystem(hardwareMap);
-        register(m_drive);
+        m_troll = new TrollSubsystem(hardwareMap, "servo");
+        register(m_drive, m_troll);
 
         schedule(new InstantCommand(m_drive::startTeleOp, m_drive));
 
@@ -32,16 +36,20 @@ public class TeleOp extends CommandOpMode {
                                 -m_driver.getRightX(),
                                 true
                         ), m_drive));
-//
-//        m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-//                .whileHeld(new RunCommand(() ->
-//                        m_drive.drive(
-//                                0.5*m_driver.getLeftX(),
-//                                0.5*m_driver.getLeftY(),
-//                                0.5*m_driver.getRightX(),
-//                            true
-//                        ), m_drive))
-//                .whenReleased(new InstantCommand(m_drive::stop, m_drive));
+
+        m_driver.getGamepadButton(GamepadKeys.Button.A)
+                .whenPressed(new InstantCommand(() -> m_troll.toggle(), m_troll));
+
+
+        m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whileHeld(new RunCommand(() ->
+                        m_drive.drive(
+                                0.35*m_driver.getLeftY(),
+                                -0.35*m_driver.getLeftX(),
+                                -0.35*m_driver.getRightX(),
+                            true
+                        ), m_drive));
+
 
     }
 

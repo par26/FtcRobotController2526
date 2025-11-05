@@ -9,7 +9,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final Follower follower;
 
-
     public DriveSubsystem(HardwareMap hwMap) {
         follower = Constants.createFollower(hwMap);
     }
