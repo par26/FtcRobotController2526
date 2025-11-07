@@ -10,6 +10,8 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.OutakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.TrollSubsystem;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
@@ -17,14 +19,22 @@ public class TeleOp extends CommandOpMode {
 
     private GamepadEx m_driver;
     private DriveSubsystem m_drive;
+
+    private IntakeSubsystem m_intake;
     private TrollSubsystem m_troll;
+
+    private OutakeSubsystem m_outake;
+
+    Telemetry telemetry;
 
     @Override
     public void initialize() {
         m_driver = new GamepadEx(gamepad1);
         m_drive = new DriveSubsystem(hardwareMap);
+        m_intake = new IntakeSubsystem(hardwareMap);
         m_troll = new TrollSubsystem(hardwareMap, "servo");
-        register(m_drive, m_troll);
+        m_outake = new OutakeSubsystem(hardwareMap);
+        register(m_drive, m_troll, m_intake, m_outake);
 
         schedule(new InstantCommand(m_drive::startTeleOp, m_drive));
 
@@ -50,6 +60,16 @@ public class TeleOp extends CommandOpMode {
                             true
                         ), m_drive));
 
+
+        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new RunCommand(() ->
+                    m_outake.spin()
+            ));
+
+        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new RunCommand(() ->
+                        m_outake.stop()
+                ));
 
     }
 
