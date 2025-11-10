@@ -62,13 +62,17 @@ public class TeleOp extends CommandOpMode {
 
 
         m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new RunCommand(() ->
-                    m_outake.spin()
+                .whenPressed(new InstantCommand(() ->
+                    m_outake.toggle(), m_outake
             ));
 
-        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new RunCommand(() ->
-                        m_outake.stop()
+        m_driver.getGamepadButton(GamepadKeys.Button.B)
+                .whenPressed(new InstantCommand(() ->
+                        m_intake.toggle1(), m_intake
+                ));
+        m_driver.getGamepadButton(GamepadKeys.Button.Y)
+                .whenPressed(new InstantCommand(() ->
+                        m_intake.toggle2(), m_intake
                 ));
 
     }

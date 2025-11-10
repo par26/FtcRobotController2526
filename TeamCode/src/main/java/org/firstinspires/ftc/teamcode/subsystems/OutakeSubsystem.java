@@ -9,6 +9,8 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 public class OutakeSubsystem extends SubsystemBase{
     Motor flywheelMotorLeft;
     Motor flywheelMotorRight;
+
+    boolean spinning;
     PIDCoefficients pid = new PIDCoefficients(0.5, 0, .2);
 
 
@@ -29,16 +31,24 @@ public class OutakeSubsystem extends SubsystemBase{
         flywheelMotorLeft.resetEncoder();
 
         power = 0;
+        spinning = false;
     }
 
     public void spin() {
-        power = .75;
+        power = .9;
     }
 
     public void stop() {
        power = 0;
     }
 
+
+    public void toggle() {
+
+        spinning = !spinning;
+
+      power = spinning ? 0 : 0.5;
+    }
     public double  speed() {
         return flywheelMotorRight.getCorrectedVelocity();
     }
