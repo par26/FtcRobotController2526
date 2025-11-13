@@ -1,23 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 
-public class OutakeSubsystem extends SubsystemBase{
+public class OuttakeSubsystem extends SubsystemBase{
     Motor flywheelMotorLeft;
     Motor flywheelMotorRight;
 
-    boolean spinning;
+    boolean isSpinning;
     PIDCoefficients pid = new PIDCoefficients(0.5, 0, .2);
 
 
     double power;
     // set and get the coefficients
 
-    public OutakeSubsystem(HardwareMap hardwareMap) {
+    public OuttakeSubsystem(HardwareMap hardwareMap) {
         flywheelMotorLeft = new Motor(hardwareMap, "leftFlyWheel",28, 6000);
         flywheelMotorRight = new Motor(hardwareMap, "rightFlyWheel", 28, 6000);
         flywheelMotorRight.setRunMode(Motor.RunMode.VelocityControl);
@@ -31,26 +30,30 @@ public class OutakeSubsystem extends SubsystemBase{
         flywheelMotorLeft.resetEncoder();
 
         power = 0;
-        spinning = false;
+        isSpinning = false;
     }
 
     public void spin() {
-        power = .9;
+        flywheelMotorRight.setRunMode(Motor.RunMode.VelocityControl);
+        flywheelMotorLeft.setRunMode(Motor.RunMode.VelocityControl);
+        power = 0.5;
     }
 
     public void stop() {
-       power = 0;
+        flywheelMotorRight.setRunMode(Motor.RunMode.RawPower);
+        flywheelMotorLeft.setRunMode(Motor.RunMode.RawPower);
+        power = 0;
     }
 
 
     public void toggle() {
+        isSpinning = !isSpinning;
 
-        spinning = !spinning;
-
-      power = spinning ? 0 : 0.5;
-    }
-    public double  speed() {
-        return flywheelMotorRight.getCorrectedVelocity();
+        if (isSpinning) {
+            stop();
+        } else {
+            spin();
+        }
     }
 
     @Override
