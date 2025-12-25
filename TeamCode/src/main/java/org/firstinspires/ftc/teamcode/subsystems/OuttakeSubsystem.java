@@ -1,16 +1,20 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
-
+@Configurable
 public class OuttakeSubsystem extends SubsystemBase{
     Motor flywheelMotorLeft;
     Motor flywheelMotorRight;
+    public static double LAUNCH_POWER_CLOSE = 0.41;
+    public static double LAUNCH_POWER_FAR = 0.50;
+    public static double STOP_POWER = 0;
 
     boolean isSpinning;
-    PIDCoefficients pid = new PIDCoefficients(0.5, 0, .2);
+    PIDCoefficients pid = new PIDCoefficients(0.7, 0, .2);
 
 
     double power;
@@ -21,6 +25,10 @@ public class OuttakeSubsystem extends SubsystemBase{
         flywheelMotorRight = new Motor(hardwareMap, "rightFlyWheel", 28, 6000);
         flywheelMotorRight.setRunMode(Motor.RunMode.VelocityControl);
         flywheelMotorLeft.setRunMode(Motor.RunMode.VelocityControl);
+
+        flywheelMotorLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        flywheelMotorRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         flywheelMotorLeft.setInverted(true);
 
         flywheelMotorLeft.setVeloCoefficients(0.05, 0, 0.01);
@@ -29,32 +37,32 @@ public class OuttakeSubsystem extends SubsystemBase{
         flywheelMotorRight.resetEncoder();
         flywheelMotorLeft.resetEncoder();
 
-        power = 0;
-        isSpinning = false;
+        power = LAUNCH_POWER_CLOSE;
+        isSpinning = true;
     }
 
-    public void spin() {
+    public void spin(boolean isThree) {
         flywheelMotorRight.setRunMode(Motor.RunMode.VelocityControl);
         flywheelMotorLeft.setRunMode(Motor.RunMode.VelocityControl);
-        power = 0.5;
+        power = isThree ? LAUNCH_POWER_FAR : LAUNCH_POWER_CLOSE;
     }
 
     public void stop() {
         flywheelMotorRight.setRunMode(Motor.RunMode.RawPower);
         flywheelMotorLeft.setRunMode(Motor.RunMode.RawPower);
-        power = 0;
+        power = STOP_POWER;
     }
 
 
-    public void toggle() {
-        isSpinning = !isSpinning;
-
-        if (isSpinning) {
-            stop();
-        } else {
-            spin();
-        }
-    }
+//    public void toggle() {
+//        isSpinning = !isSpinning;
+//
+//        if (isSpinning) {
+//            stop();
+//        } else {
+//            spin();
+//        }
+//    }
 
     @Override
     public void periodic() {

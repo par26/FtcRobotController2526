@@ -6,11 +6,11 @@ import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.TrollSubsystem;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class TeleOp extends CommandOpMode {
@@ -19,11 +19,7 @@ public class TeleOp extends CommandOpMode {
     private DriveSubsystem m_drive;
 
     private IntakeSubsystem m_intake;
-    private TrollSubsystem m_troll;
-
     private OuttakeSubsystem m_outtake;
-
-    Telemetry telemetry;
 
     @Override
     public void initialize() {
@@ -31,42 +27,33 @@ public class TeleOp extends CommandOpMode {
         m_drive = new DriveSubsystem(hardwareMap);
         m_intake = new IntakeSubsystem(hardwareMap);
         m_outtake = new OuttakeSubsystem(hardwareMap);
-        register(m_drive, m_troll, m_intake, m_outtake);
 
-        schedule(new InstantCommand(m_drive::startTeleOp, m_drive));
+        register(m_drive, m_intake, m_outtake);
 
         m_drive.setDefaultCommand(
-                new RunCommand(() ->
-                        m_drive.drive(
-                                m_driver.getLeftY(),
-                                -m_driver.getLeftX(),
-                                -m_driver.getRightX(),
-                                true
-                        ), m_drive));
+                new DriveCommand(
+                        m_drive,
+                        () -> m_driver.getLeftY(),
+                        () -> -m_driver.getLeftX(),
+                        () -> -m_driver.getRightX(),
+                        () -> true,
+                        () -> m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).get() ? 0.35 : 1.0
+                )
+        );
 
-        m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whileHeld(new RunCommand(() ->
-                        m_drive.drive(
-                                0.35*m_driver.getLeftY(),
-                                -0.35*m_driver.getLeftX(),
-                                -0.35*m_driver.getRightX(),
-                            true
-                        ), m_drive));
-
+        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whileHeld(new InstantCommand(() -> m_intake.reverse1(), m_intake))
+                .whenReleased(new RunCommand(() -> m_intake.forward1(), m_intake));
 
         m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(() ->
-                    m_outtake.toggle(), m_outtake
-            ));
+                .whileHeld(new InstantCommand(() -> m_intake.set2(true), m_intake))
+                .whenReleased(new RunCommand(() -> m_intake.set2(false), m_intake));
 
         m_driver.getGamepadButton(GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(() ->
-                        m_intake.toggle1(), m_intake
-                ));
-        m_driver.getGamepadButton(GamepadKeys.Button.Y)
-                .whenPressed(new InstantCommand(() ->
-                        m_intake.toggle2(), m_intake
-                ));
+                .whenPressed(new InstantCommand(() -> m_outtake.spin(true), m_outtake));
+
+        m_driver.getGamepadButton(GamepadKeys.Button.X)
+                .whenPressed(new InstantCommand(() -> m_outtake.spin(false), m_outtake));
 
     }
 

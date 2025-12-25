@@ -11,23 +11,23 @@ public class IntakeSubsystem  extends SubsystemBase{
 
     private final DcMotorEx motor1;
     private final DcMotorEx motor2;
-    public static double SPINSPEED_1 = 0.45;
-    public static double SPINSPEED_2 = 0.35;
+    public static double SPINSPEED_1 = 0.53;
+    public static double SPINSPEED_2 = 0.55;
     private double speed_1;
     private double speed_2;
 
     public boolean isSpinning1, isSpinning2;
 
     public IntakeSubsystem(HardwareMap hwMap) {
-        motor1 = hwMap.get(DcMotorEx.class, "motor");
-        motor2 = hwMap.get(DcMotorEx.class, "motor2");
+        motor1 = hwMap.get(DcMotorEx.class, "intake1");
+        motor2 = hwMap.get(DcMotorEx.class, "intake2");
 
-        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
         motor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        isSpinning1 = false;
+        isSpinning1 = true;
         isSpinning2 = false;
-        speed_1 = 0;
+        speed_1 = SPINSPEED_1;
         speed_2 = 0;
     }
 
@@ -51,6 +51,14 @@ public class IntakeSubsystem  extends SubsystemBase{
     public void set2(boolean startSpin) {
         speed_2 = startSpin ? SPINSPEED_2 : 0;
         isSpinning2 = startSpin;
+    }
+
+    public void reverse1() {
+        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    public void forward1() {
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
 
