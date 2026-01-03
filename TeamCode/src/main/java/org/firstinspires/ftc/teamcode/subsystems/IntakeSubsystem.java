@@ -1,70 +1,39 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Configurable
-public class IntakeSubsystem  extends SubsystemBase{
+public class IntakeSubsystem extends SubsystemBase {
 
+    private CRServo m_servo;
+    private boolean isIntaking = true;
+    private double spinSpeed;
 
-    private final DcMotorEx motor1;
-    private final DcMotorEx motor2;
-    public static double SPINSPEED_1 = 0.53;
-    public static double SPINSPEED_2 = 0.55;
-    private double speed_1;
-    private double speed_2;
-
-    public boolean isSpinning1, isSpinning2;
+    public static double SPIN_POWER = 0.75;
+    public static double REVERSE_POWER = 0.65;
 
     public IntakeSubsystem(HardwareMap hwMap) {
-        motor1 = hwMap.get(DcMotorEx.class, "intake1");
-        motor2 = hwMap.get(DcMotorEx.class, "intake2");
+        m_servo = hwMap.get(CRServo.class, "intakeServo");
+        m_servo.setDirection(CRServo.Direction.FORWARD);
 
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        isSpinning1 = true;
-        isSpinning2 = false;
-        speed_1 = SPINSPEED_1;
-        speed_2 = 0;
     }
 
-    public void toggle1() {
-        isSpinning1 = !isSpinning1;
+    public void IntakeToggle() {
+        isIntaking = !isIntaking;
+        if (isIntaking) {
+            m_servo.setDirection(CRServo.Direction.FORWARD);
+        } else {
+            m_servo.setDirection(CRServo.Direction.REVERSE);
+        }
 
-        speed_1 = isSpinning1 ? SPINSPEED_1 : 0;
-    }
-
-    public void toggle2() {
-        isSpinning2 = !isSpinning2;
-
-        speed_2 = isSpinning2 ? SPINSPEED_2 : 0;
-    }
-
-    public void set1(boolean startSpin) {
-        speed_1 = startSpin ? SPINSPEED_1 : 0;
-        isSpinning1 = startSpin;
-    }
-
-    public void set2(boolean startSpin) {
-        speed_2 = startSpin ? SPINSPEED_2 : 0;
-        isSpinning2 = startSpin;
-    }
-
-    public void reverse1() {
-        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
-    }
-
-    public void forward1() {
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        spinSpeed = isIntaking ? SPIN_POWER : REVERSE_POWER;
     }
 
 
     @Override
     public void periodic() {
-        motor1.setPower(speed_1);
-        motor2.setPower(speed_2);
+        m_servo.setPower(spinSpeed);
     }
 }
