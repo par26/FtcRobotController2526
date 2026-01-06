@@ -11,6 +11,8 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 
+import kotlin.time.Instant;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class TeleOp extends CommandOpMode {
@@ -41,13 +43,12 @@ public class TeleOp extends CommandOpMode {
                 )
         );
 
-        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whileHeld(new InstantCommand(() -> m_intake.reverse1(), m_intake))
-                .whenReleased(new RunCommand(() -> m_intake.forward1(), m_intake));
+        m_intake.setDefaultCommand(
+                new RunCommand(() -> m_intake.intake(), m_intake)
+        );
 
         m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whileHeld(new InstantCommand(() -> m_intake.set2(true), m_intake))
-                .whenReleased(new RunCommand(() -> m_intake.set2(false), m_intake));
+                .whileHeld(new InstantCommand(() -> m_intake.reverse(), m_intake));
 
         m_driver.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new InstantCommand(() -> m_outtake.spin(true), m_outtake));
