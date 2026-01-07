@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MoveSubsystem;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="EventAuto")
+//temporary autonomous to move forward & gain points
 public class Auto extends CommandOpMode {
 
     private MoveSubsystem m_move;

@@ -20,7 +20,8 @@ public class Constants {
             .lateralZeroPowerAcceleration(-52.114)
 
             .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.1, 0.02))
-                ;
+
+            ;
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -48,8 +49,8 @@ public class Constants {
             .useBrakeModeInTeleOp(true);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-1.9)
-            .strafePodX(-0.2)
+            .forwardPodY(-3.225)
+            .strafePodX(-4.5)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
