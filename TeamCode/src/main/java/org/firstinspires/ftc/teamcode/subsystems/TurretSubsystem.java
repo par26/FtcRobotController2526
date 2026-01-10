@@ -108,6 +108,7 @@ public class TurretSubsystem extends SubsystemBase{
             int curID = curTag.getFiducialId();
             if (motifIDs.containsKey(curTag.getFiducialId()) && !hasFoundMotifTag) {
                 gameMotif = motifIDs.get(curID);
+                gameMotif = motifIDs.get(curTag.getFiducialId());
                 hasFoundMotifTag = true;
                 continue;
             }
@@ -115,6 +116,7 @@ public class TurretSubsystem extends SubsystemBase{
             if (!hasFoundGoalTag) {
                 if (curID == BLUE_TAG && isBlueAlliance) {
                     goalTag = curTag;
+                    gameMotif = motifIDs.get(curTag.getFiducialId());
                     hasFoundGoalTag = true;
                     continue;
                 }
