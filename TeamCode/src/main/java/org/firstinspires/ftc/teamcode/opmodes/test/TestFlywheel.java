@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 
-@TeleOp
+@TeleOp(group="test")
 public class TestFlywheel extends CommandOpMode {
 
     private OuttakeSubsystem m_outtake;

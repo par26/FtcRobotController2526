@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
-@TeleOp
+@TeleOp(group="test")
 public class TestMotor extends CommandOpMode {
 
     private IntakeSubsystem intake;

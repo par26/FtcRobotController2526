@@ -29,7 +29,7 @@ public class TurretSubsystem extends SubsystemBase{
 
     private List<LLResultTypes.FiducialResult> foundTags;
     private LLResultTypes.FiducialResult goalTag;
-    private String gameMotif;
+    public static String gameMotif;
     private boolean isBlueAlliance;
 
     private double goal_tx;
@@ -44,11 +44,6 @@ public class TurretSubsystem extends SubsystemBase{
 
     //TODO: boolean value for alliance side
 
-    /**
-     *
-     * @param hwMap hardware map
-     * @param isBlueAlliance boolean val: true if on blue alliance, false if not
-     */
     public TurretSubsystem(HardwareMap hwMap, boolean isBlueAlliance) {
         m_limelight = hwMap.get(Limelight3A.class, "limelight");
         m_motor = new Motor(hwMap, "turretMotor", 28, 6000);
@@ -108,7 +103,6 @@ public class TurretSubsystem extends SubsystemBase{
             int curID = curTag.getFiducialId();
             if (motifIDs.containsKey(curTag.getFiducialId()) && !hasFoundMotifTag) {
                 gameMotif = motifIDs.get(curID);
-                gameMotif = motifIDs.get(curTag.getFiducialId());
                 hasFoundMotifTag = true;
                 continue;
             }

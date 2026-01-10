@@ -10,7 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
-@TeleOp
+@TeleOp(group="test")
 public class TestDriveTrain extends CommandOpMode {
 
     private GamepadEx m_driver;

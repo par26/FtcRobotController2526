@@ -1,23 +1,17 @@
 package org.firstinspires.ftc.teamcode.opmodes.test;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.AxonSubsystem;
-import org.firstinspires.ftc.teamcode.util.RTPAxon;
-
-import kotlin.time.Instant;
+import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
 
 @TeleOp(name = "Cont. Rotation Axon Test", group = "test")
 public class TestRTPAxon extends CommandOpMode {
 
-    private AxonSubsystem axon;
+    private RTPSubsystem axon;
     private GamepadEx m_driver;
 
     @Override
@@ -26,7 +20,7 @@ public class TestRTPAxon extends CommandOpMode {
 
 
         m_driver = new GamepadEx(gamepad1);
-        axon = new AxonSubsystem(hardwareMap, telemetry);
+        axon = new RTPSubsystem(hardwareMap);
 
         register(axon);
 

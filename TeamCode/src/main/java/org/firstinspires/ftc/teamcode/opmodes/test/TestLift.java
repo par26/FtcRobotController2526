@@ -3,32 +3,30 @@ package org.firstinspires.ftc.teamcode.opmodes.test;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LiftSubsystem;
 
+import kotlin.time.Instant;
 
 @TeleOp(group="test")
-public class TestIntake extends CommandOpMode {
+public class TestLift extends CommandOpMode {
 
+    private LiftSubsystem m_lift;
     private GamepadEx m_driver;
-    private IntakeSubsystem m_intake;
 
     @Override
     public void initialize() {
+        m_lift = new LiftSubsystem(hardwareMap);
         m_driver = new GamepadEx(gamepad1);
-        m_intake = new IntakeSubsystem(hardwareMap);
 
-        register(m_intake);
-
-        m_intake.setDefaultCommand(
-                new RunCommand(() -> m_intake.intake(), m_intake)
-        );
+        register(m_lift);
 
         m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whileHeld(new InstantCommand(() -> m_intake.reverse(), m_intake));
+                .whenPressed(new InstantCommand(() -> m_lift.arise(), m_lift));
 
+        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+            .whenPressed(new InstantCommand(() -> m_lift.reset(), m_lift));
     }
 }
