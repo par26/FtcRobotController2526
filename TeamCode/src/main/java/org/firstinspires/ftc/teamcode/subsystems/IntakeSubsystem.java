@@ -8,35 +8,32 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class IntakeSubsystem extends SubsystemBase {
 
     private CRServo m_servo;
+    private boolean isIntaking = true;
     private double spinSpeed;
-    private final CRServo.Direction intakingDirection = CRServo.Direction.REVERSE;
-    private final CRServo.Direction reversingDirection = CRServo.Direction.FORWARD;
-    private CRServo.Direction curDirection;
 
-    public static double INTAKE_POWER = 1;
-    public static double REVERSE_POWER = 1;
+    public static double SPIN_POWER = 0.75;
+    public static double REVERSE_POWER = 0.65;
 
-    //remember to tune directions
     public IntakeSubsystem(HardwareMap hwMap) {
         m_servo = hwMap.get(CRServo.class, "intakeServo");
-        m_servo.setDirection(intakingDirection);
-        m_servo.setPower(INTAKE_POWER);
+        m_servo.setDirection(CRServo.Direction.FORWARD);
 
     }
 
-    public void intake() {
-        curDirection = intakingDirection;
-        spinSpeed = INTAKE_POWER;
+    public void IntakeToggle() {
+        isIntaking = !isIntaking;
+        if (isIntaking) {
+            m_servo.setDirection(CRServo.Direction.FORWARD);
+        } else {
+            m_servo.setDirection(CRServo.Direction.REVERSE);
+        }
+
+        spinSpeed = isIntaking ? SPIN_POWER : REVERSE_POWER;
     }
 
-    public void reverse() {
-        curDirection = reversingDirection;
-        spinSpeed = REVERSE_POWER;
-    }
 
     @Override
     public void periodic() {
         m_servo.setPower(spinSpeed);
-        m_servo.setDirection(curDirection);
     }
 }

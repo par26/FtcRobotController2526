@@ -56,8 +56,8 @@ public class SorterSubsystem extends SubsystemBase{
         sorterNodes.put(2, NodeOption.EMPTY);
         sorterNodes.put(3, NodeOption.EMPTY);
 
-        m_axon = new RTPAxon(m_servo, m_encoder);
-        m_axon.setRtp(true);
+        m_axon = new RTPAxon(hwMap, "servo", "encoder");
+        //m_axon.setRtp(true);
 
         state = SorterState.INTAKE;
     }

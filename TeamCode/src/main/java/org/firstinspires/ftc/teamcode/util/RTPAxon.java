@@ -2,346 +2,451 @@ package org.firstinspires.ftc.teamcode.util;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
+import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+/**
+ * Wrapper class for CRServoEx with AbsoluteAnalogEncoder
+ * Provides easy setup, telemetry, and positional control for Axon servos
+ */
 public class RTPAxon {
-    // Encoder for servo position feedback
-    private final AnalogInput servoEncoder;
-    // Continuous rotation servo
-    private final CRServo servo;
-    // Run-to-position mode flag
-    private boolean rtp;
-    // Current power applied to servo
-    private double power;
-    // Maximum allowed power
-    private double maxPower;
-    // Direction of servo movement
-    private Direction direction;
-    // Last measured angle
-    private double previousAngle;
-    // Accumulated rotation in degrees
-    private double totalRotation;
-    // Target rotation in degrees
-    private double targetRotation;
+    // SolversLib hardware
+    private final CRServoEx crServo;
+    private final AbsoluteAnalogEncoder encoder;
 
-    // PID controller coefficients and state
+    // Configuration
+    private final String servoName;
+    private final String encoderName;
+
     private double kP;
     private double kI;
     private double kD;
-    private double integralSum;
-    private double lastError;
-    private double maxIntegralSum; 
-    private ElapsedTime pidTimer;
 
-    // Initialization and debug fields
-    public double STARTPOS;
-    public int ntry = 0;
-    public int cliffs = 0;
-    public double homeAngle;
+    // Control state
+    private double targetPosition; // in degrees
+    private boolean positionControlEnabled;
 
-    // Direction enum for servo
-    public enum Direction {
-        FORWARD,
-        REVERSE
+    // Telemetry fields
+    public int initAttempts = 0;
+    private double lastSetPosition = 0;
+
+    // region Constructors
+
+    /**
+     * Basic constructor with default PIDF values
+     * Uses degrees as angle unit, 3.3V encoder range
+     *
+     * @param hwMap Hardware map
+     * @param servoID Name of CR servo in config
+     * @param encoderID Name of analog encoder in config
+     */
+    public RTPAxon(HardwareMap hwMap, String servoID, String encoderID) {
+        this(hwMap, servoID, encoderID, new PIDFCoefficients(0.01, 0.0, 0.005, 0.0));
     }
 
-    // region constructors
+    /**
+     * Constructor with custom PIDF coefficients
+     *
+     * @param hwMap Hardware map
+     * @param servoID Name of CR servo in config
+     * @param encoderID Name of analog encoder in config
+     * @param pidfCoeffs Custom PIDF coefficients for position control
+     */
+    public RTPAxon(HardwareMap hwMap, String servoID, String encoderID, PIDFCoefficients pidfCoeffs) {
+        this.servoName = servoID;
+        this.encoderName = encoderID;
 
-    // Basic constructor, defaults to FORWARD direction
-    public RTPAxon(CRServo servo, AnalogInput encoder) {
-        rtp = true;
-        this.servo = servo;
-        servoEncoder = encoder;
-        direction = Direction.FORWARD;
-        initialize();
+        // Initialize encoder (3.3V range, degrees)
+        encoder = new AbsoluteAnalogEncoder(hwMap, encoderID, 3.3, AngleUnit.DEGREES);
+
+        // Initialize CRServoEx in OptimizedPositionalControl mode
+        crServo = new CRServoEx(
+                hwMap,
+                servoID,
+                encoder,
+                CRServoEx.RunMode.OptimizedPositionalControl
+        );
+
+        // Set PIDF coefficients
+        crServo.setPIDF(pidfCoeffs);
+
+        // Optional: Set power caching tolerance for loop optimization
+        crServo.setCachingTolerance(0.0001);
+
+        // Wait for valid encoder reading
+        waitForValidEncoder();
+
+        // Initialize to current position
+        targetPosition = getCurrentPosition();
+        positionControlEnabled = true;
+        lastSetPosition = targetPosition;
     }
 
-    // Constructor with explicit direction
-    public RTPAxon(CRServo servo, AnalogInput encoder, Direction direction) {
-        this(servo, encoder);
-        this.direction = direction;
-        initialize();
+    /**
+     * Advanced constructor with encoder configuration
+     *
+     * @param hwMap Hardware map
+     * @param servoID Name of CR servo in config
+     * @param encoderID Name of analog encoder in config
+     * @param analogRange Voltage range (3.3 or 5.0)
+     * @param angleUnit Angle unit (DEGREES or RADIANS)
+     * @param pidfCoeffs PIDF coefficients
+     */
+    public RTPAxon(HardwareMap hwMap, String servoID, String encoderID,
+                   double analogRange, AngleUnit angleUnit, PIDFCoefficients pidfCoeffs) {
+        this.servoName = servoID;
+        this.encoderName = encoderID;
+
+        // Initialize encoder with custom settings
+        encoder = new AbsoluteAnalogEncoder(hwMap, encoderID, analogRange, angleUnit);
+
+        // Initialize CRServoEx
+        crServo = new CRServoEx(
+                hwMap,
+                servoID,
+                encoder,
+                CRServoEx.RunMode.OptimizedPositionalControl
+        );
+
+        crServo.setPIDF(pidfCoeffs);
+        crServo.setCachingTolerance(0.0001);
+
+        waitForValidEncoder();
+
+        targetPosition = getCurrentPosition();
+        positionControlEnabled = true;
+        lastSetPosition = targetPosition;
     }
 
-    // Initialization logic for servo and encoder
-    private void initialize() {
-        servo.setPower(0);
-//        try {
-////            Thread.sleep(50);
-//        } catch (InterruptedException ignored) {
-//        }
+    /**
+     * Wait for encoder to provide valid readings
+     */
+    private void waitForValidEncoder() {
+        initAttempts = 0;
+        double voltage;
 
-        // Try to get a valid starting position
         do {
-            STARTPOS = getCurrentAngle();
-            if (Math.abs(STARTPOS) > 1) {
-                previousAngle = getCurrentAngle();
-            } else {
-//                try {
-////                    Thread.sleep(50);
-//                } catch (InterruptedException ignored) {
-//                }
+            voltage = encoder.getVoltage();
+            initAttempts++;
+
+            if (initAttempts > 50) {
+                break;
             }
-            ntry++;
-        } while (Math.abs(previousAngle) < 0.2 && (ntry < 50));
 
-        totalRotation = 0;
-        homeAngle = previousAngle;
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ignored) {}
 
-        // Default PID coefficients
-        kP = 0.015; 
-        kI = 0.0005; 
-        kD = 0.0025;
-        integralSum = 0.0;
-        lastError = 0.0;
-        maxIntegralSum = 100.0;
-        pidTimer = new ElapsedTime();
-        pidTimer.reset();
-
-        maxPower = 0.25;
-        cliffs = 0;
+        } while (Math.abs(voltage) < 0.1);
     }
+
     // endregion
 
-    // Set servo direction
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    // region Position Control Methods
+
+    /**
+     * Set target position in degrees
+     * Servo will automatically move to this position using shortest path
+     *
+     * @param degrees Target position in degrees (0-360)
+     */
+    public void setTargetPosition(double degrees) {
+        if (!positionControlEnabled) {
+            enablePositionControl();
+        }
+
+        // Convert to radians for CRServoEx
+        targetPosition = degrees;
+        lastSetPosition = degrees;
+        crServo.set(Math.toRadians(degrees));
     }
 
-    // Set power to servo, respecting direction and maxPower
+    /**
+     * Change target position by a delta
+     *
+     * @param deltaDegrees Amount to change position by (in degrees)
+     */
+    public void changeTargetPosition(double deltaDegrees) {
+        setTargetPosition(targetPosition + deltaDegrees);
+    }
+
+    /**
+     * Get current target position
+     *
+     * @return Target position in degrees
+     */
+    public double getTargetPosition() {
+        return targetPosition;
+    }
+
+    /**
+     * Get current actual position from encoder
+     *
+     * @return Current position in degrees (0-360)
+     */
+    public double getCurrentPosition() {
+        // CRServoEx uses radians internally, convert to degrees
+        double radians = crServo.get();
+        double degrees = Math.toDegrees(radians);
+
+        // Normalize to 0-360
+        while (degrees < 0) degrees += 360;
+        while (degrees >= 360) degrees -= 360;
+
+        return degrees;
+    }
+
+    /**
+     * Get current position error
+     *
+     * @return Error in degrees (target - current)
+     */
+    public double getError() {
+        double current = getCurrentPosition();
+        double error = targetPosition - current;
+
+        // Normalize to -180 to +180 (shortest path)
+        while (error > 180) error -= 360;
+        while (error < -180) error += 360;
+
+        return error;
+    }
+
+    /**
+     * Check if servo is at target position within default tolerance (5°)
+     *
+     * @return True if at target
+     */
+    public boolean isAtTarget() {
+        return isAtTarget(5.0);
+    }
+
+    /**
+     * Check if servo is at target position within custom tolerance
+     *
+     * @param toleranceDegrees Tolerance in degrees
+     * @return True if at target
+     */
+    public boolean isAtTarget(double toleranceDegrees) {
+        return Math.abs(getError()) < toleranceDegrees;
+    }
+
+    // endregion
+
+    // region Power Control Methods
+
+    /**
+     * Set raw power to servo (disables position control)
+     * Use this for manual control
+     *
+     * @param power Power from -1.0 to 1.0
+     */
     public void setPower(double power) {
-        this.power = Math.max(-maxPower, Math.min(maxPower, power));
-        servo.setPower(this.power * (direction == Direction.REVERSE ? -1 : 1));
+        disablePositionControl();
+        crServo.set(power);
     }
 
-    // Get current power
-    public double getPower() {
-        return power;
-    }
-
-    // Set maximum allowed power
-    public void setMaxPower(double maxPower) {
-        this.maxPower = maxPower;
-    }
-
-    // Get maximum allowed power
-    public double getMaxPower() {
-        return maxPower;
-    }
-
-    // Enable or disable run-to-position mode
-    public void setRtp(boolean rtp) {
-        this.rtp = rtp;
-        if (rtp) {
-            resetPID();
+    /**
+     * Enable position control mode
+     */
+    public void enablePositionControl() {
+        if (!positionControlEnabled) {
+            crServo.setRunMode(CRServoEx.RunMode.OptimizedPositionalControl);
+            positionControlEnabled = true;
+            // Reset to current position
+            targetPosition = getCurrentPosition();
         }
     }
 
-    // Get run-to-position mode state
-    public boolean getRtp() {
-        return rtp;
+    /**
+     * Disable position control (switches to raw power mode)
+     */
+    public void disablePositionControl() {
+        if (positionControlEnabled) {
+            crServo.setRunMode(CRServoEx.RunMode.RawPower);
+            positionControlEnabled = false;
+        }
     }
 
-    // Set PID P coefficient
-    public void setKP(double kP) {
+    /**
+     * Check if position control is enabled
+     *
+     * @return True if position control is active
+     */
+    public boolean isPositionControlEnabled() {
+        return positionControlEnabled;
+    }
+
+    // endregion
+
+    // region PIDF Configuration
+
+    /**
+     * Set PIDF coefficients for position control
+     *
+     * @param pidfCoeffs New PIDF coefficients
+     */
+    public void setPIDF(PIDFCoefficients pidfCoeffs) {
+        crServo.setPIDF(pidfCoeffs);
+    }
+
+    /**
+     * Set PIDF coefficients individually
+     *
+     * @param kP Proportional gain
+     * @param kI Integral gain
+     * @param kD Derivative gain
+     * @param kF Feed-forward gain
+     */
+    public void setPIDF(double kP, double kI, double kD, double kF) {
+        crServo.setPIDF(new PIDFCoefficients(kP, kI, kD, kF));
         this.kP = kP;
-    }
-
-    // Set PID I coefficient and reset integral
-    public void setKI(double kI) {
         this.kI = kI;
-        resetIntegral(); 
-    }
-
-    // Set PID D coefficient
-    public void setKD(double kD) {
         this.kD = kD;
     }
 
-    // Set all PID coefficients
-    public void setPidCoeffs(double kP, double kI, double kD){
-        setKP(kP);
-        setKI(kI);
-        setKD(kD);
+    /**
+     * Get current PIDF coefficients
+     *
+     * @return Current PIDF coefficients
+     */
+    /**
+     * Set power caching tolerance
+     * Lower values = more precise but potentially slower
+     *
+     * @param tolerance Caching tolerance (default: 0.0001)
+     */
+    public void setCachingTolerance(double tolerance) {
+        crServo.setCachingTolerance(tolerance);
     }
 
-    // Get PID P coefficient
-    public double getKP() {
-        return kP;
+    /**
+     * Get power caching tolerance
+     *
+     * @return Current caching tolerance
+     */
+    public double getCachingTolerance() {
+        return crServo.getCachingTolerance();
     }
 
-    // Get PID I coefficient
-    public double getKI() {
-        return kI;
+    /**
+     * Set servo direction reversed
+     *
+     * @param reversed True to reverse direction
+     */
+    public void setReversed(boolean reversed) {
+        crServo.setInverted(reversed);
     }
 
-    // Get PID D coefficient
-    public double getKD() {
-        return kD;
+    /**
+     * Check if servo is reversed
+     *
+     * @return True if reversed
+     */
+    public boolean isReversed() {
+        return crServo.getInverted();
     }
 
-    // Set only P coefficient (alias)
-    public void setK(double k) {
-        setKP(k);
+    // endregion
+
+    // region Hardware Access
+
+    /**
+     * Get raw encoder voltage
+     *
+     * @return Encoder voltage (0-3.3V typically)
+     */
+    public double getEncoderVoltage() {
+        return encoder.getVoltage();
     }
 
-    // Get only P coefficient (alias)
-    public double getK() {
-        return getKP();
+    /**
+     * Get raw encoder angle in radians
+     *
+     * @return Angle in radians
+     */
+    public double getEncoderAngleRadians() {
+        return crServo.getCurrentPosition();
     }
 
-    // Set maximum allowed integral sum
-    public void setMaxIntegralSum(double maxIntegralSum) {
-        this.maxIntegralSum = maxIntegralSum;
+    /**
+     * Get underlying CRServoEx object
+     *
+     * @return CRServoEx instance
+     */
+    public CRServoEx getCRServo() {
+        return crServo;
     }
 
-    // Get maximum allowed integral sum
-    public double getMaxIntegralSum() {
-        return maxIntegralSum;
+    /**
+     * Get underlying AbsoluteAnalogEncoder object
+     *
+     * @return AbsoluteAnalogEncoder instance
+     */
+    public AbsoluteAnalogEncoder getEncoder() {
+        return encoder;
     }
 
-    // Get total rotation since initialization
-    public double getTotalRotation() {
-        return totalRotation;
-    }
+    // endregion
 
-    // Get current target rotation
-    public double getTargetRotation() {
-        return targetRotation;
-    }
+    // region Telemetry
 
-    // Increment target rotation by a value
-    public void changeTargetRotation(double change) {
-        targetRotation += change;
-    }
-
-    // Set target rotation and reset PID
-    public void setTargetRotation(double target) {
-        targetRotation = target;
-        resetPID();
-    }
-
-    // Get current angle from encoder (in degrees)
-    public double getCurrentAngle() {
-        if (servoEncoder == null) return 0;
-        return (servoEncoder.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
-    }
-
-    // Check if servo is at target (default tolerance)
-    public boolean isAtTarget() {
-        return isAtTarget(5);
-    }
-
-    // Check if servo is at target (custom tolerance)
-    public boolean isAtTarget(double tolerance) {
-        return Math.abs(targetRotation - totalRotation) < tolerance;
-    }
-
-    // Force reset total rotation and PID state
-    public void forceResetTotalRotation() {
-        totalRotation = 0;
-        previousAngle = getCurrentAngle();
-        resetPID();
-    }
-
-    // Reset PID controller state
-    public void resetPID() {
-        resetIntegral();
-        lastError = 0;
-        pidTimer.reset();
-    }
-
-    // Reset integral sum
-    public void resetIntegral() {
-        integralSum = 0;
-    }
-
-    // Main update loop: updates rotation, computes PID, applies power
-    public synchronized void update() {
-        double currentAngle = getCurrentAngle();
-        double angleDifference = currentAngle - previousAngle;
-
-        // Handle wraparound at 0/360 degrees
-        if (angleDifference > 180) {
-            angleDifference -= 360;
-            cliffs--;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
-            cliffs++;
-        }
-
-        // Update total rotation with wraparound correction
-        totalRotation = currentAngle - homeAngle + cliffs * 360;
-        previousAngle = currentAngle;
-
-        if (!rtp) return;
-
-        double dt = pidTimer.seconds();
-        pidTimer.reset();
-
-        // Ignore unreasonable dt values
-        if (dt < 0.001 || dt > 1.0) {
-            return;
-        }
-
-        double error = targetRotation - totalRotation;
-
-        // PID integral calculation with clamping
-        integralSum += error * dt;
-        integralSum = Math.max(-maxIntegralSum, Math.min(maxIntegralSum, integralSum));
-
-        // Integral wind-down in deadzone
-        final double INTEGRAL_DEADZONE = 2.0;
-        if (Math.abs(error) < INTEGRAL_DEADZONE) {
-            integralSum *= 0.95;
-        }
-
-        // PID derivative calculation
-        double derivative = (error - lastError) / dt;
-        lastError = error;
-
-        // PID output calculation
-        double pTerm = kP * error;
-        double iTerm = kI * integralSum;
-        double dTerm = kD * derivative;
-
-        double output = pTerm + iTerm + dTerm;
-
-        // Deadzone for output
-        final double DEADZONE = 5;
-        if (Math.abs(error) > DEADZONE) {
-            double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
-            setPower(power);
-        } else {
-            setPower(0);
-        }
-    }
-
-    // Log current state for telemetry/debug
+    /**
+     * Get formatted telemetry string with all relevant information
+     *
+     * @return Formatted telemetry string
+     */
     @SuppressLint("DefaultLocale")
     public String log() {
+
+
         return String.format(
-                "Current Volts: %.3f\n" +
-                        "Current Angle: %.2f\n" +
-                        "Total Rotation: %.2f\n" +
-                        "Target Rotation: %.2f\n" +
-                        "Current Power: %.3f\n" +
-                        "PID Values: P=%.3f I=%.3f D=%.3f\n" +
-                        "PID Terms: Error=%.2f Integral=%.2f",
-                servoEncoder.getVoltage(),
-                getCurrentAngle(),
-                totalRotation,
-                targetRotation,
-                power,
-                kP, kI, kD,
-                targetRotation - totalRotation,
-                integralSum
+                "=== %s ===\n" +
+                        "Encoder Voltage: %.3fV\n" +
+                        "Current Position: %.2f°\n" +
+                        "Target Position: %.2f°\n" +
+                        "Position Error: %.2f°\n" +
+                        "At Target: %s\n" +
+                        "Position Control: %s\n" +
+                        "PIDF: P=%.4f I=%.4f D=%.4f F=%.4f\n" +
+                        "Reversed: %s\n" +
+                        "Init Attempts: %d",
+                servoName,
+                getEncoderVoltage(),
+                getCurrentPosition(),
+                targetPosition,
+                getError(),
+                isAtTarget() ? "YES" : "NO",
+                positionControlEnabled ? "ENABLED" : "DISABLED",
+                this.kP, this.kI, this.kD,
+                isReversed() ? "YES" : "NO",
+                initAttempts
         );
     }
 
+    /**
+     * Get compact telemetry string (one line)
+     *
+     * @return Compact telemetry string
+     */
+    @SuppressLint("DefaultLocale")
+    public String logCompact() {
+        return String.format(
+                "%s: %.1f° → %.1f° (err: %.1f°) %s",
+                servoName,
+                getCurrentPosition(),
+                targetPosition,
+                getError(),
+                isAtTarget() ? "✓" : "..."
+        );
+    }
 
+    // endregion
 }

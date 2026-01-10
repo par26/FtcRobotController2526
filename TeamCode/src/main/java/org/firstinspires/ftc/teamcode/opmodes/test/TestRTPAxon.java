@@ -23,16 +23,18 @@ public class TestRTPAxon extends CommandOpMode {
     @Override
     public void initialize() {
 
+
+
         m_driver = new GamepadEx(gamepad1);
         axon = new AxonSubsystem(hardwareMap, telemetry);
 
         register(axon);
 
         m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(() -> axon.changeAngle(30)));
+                .whenPressed(new InstantCommand(() -> axon.changeAngle(Math.toRadians(30))));
 
         m_driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> axon.changeAngle(-30)));
+                .whenPressed(new InstantCommand(() -> axon.changeAngle(Math.toRadians(-30))));
 
         m_driver.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new InstantCommand(() -> axon.setAngle(0)));
