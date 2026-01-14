@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.annotation.SuppressLint;
-
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
@@ -14,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Configurable
 public class RTPSubsystem extends SubsystemBase {
 
-    private CRServoEx crServo;
-    private AbsoluteAnalogEncoder encoder;
+    private CRServoEx m_servo;
+    private AbsoluteAnalogEncoder m_encoder;
 
     private double error;
     private double targetPos;
@@ -26,11 +23,11 @@ public class RTPSubsystem extends SubsystemBase {
     public static double kD = 0.0015;
 
     public RTPSubsystem(HardwareMap hwMap) {
-        encoder = new AbsoluteAnalogEncoder(hwMap, "encoder");
-        crServo = new CRServoEx(hwMap, "servo", encoder, CRServoEx.RunMode.OptimizedPositionalControl);
+        m_encoder = new AbsoluteAnalogEncoder(hwMap, "sorterEncoder");
+        m_servo = new CRServoEx(hwMap, "sorterServo", m_encoder, CRServoEx.RunMode.OptimizedPositionalControl);
 
-        crServo.setPIDF(new PIDFCoefficients(kP, kI, kD, 0));
-        crServo.set(Math.toRadians(0));
+        m_servo.setPIDF(new PIDFCoefficients(kP, kI, kD, 0));
+        m_servo.set(Math.toRadians(0));
     }
 
     public void changeAngle(double angle) {
@@ -43,11 +40,11 @@ public class RTPSubsystem extends SubsystemBase {
     }
 
     public boolean isAtTarget() {
-        return crServo.atTargetPosition();
+        return m_servo.atTargetPosition();
     }
 
     public double getCurrentAngle() {
-        return (encoder.getVoltage() / 3.3) *  360;
+        return (m_encoder.getVoltage() / 3.3) *  360;
     }
 
     public double getError() {
@@ -69,6 +66,6 @@ public class RTPSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        crServo.set(targetPos);
+        m_servo.set(targetPos);
     }
 }

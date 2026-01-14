@@ -7,8 +7,11 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
+import org.firstinspires.ftc.teamcode.util.SorterNode;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configurable
 public class TurretSubsystem extends SubsystemBase{
@@ -21,7 +24,25 @@ public class TurretSubsystem extends SubsystemBase{
     private final int BLUE_TAG = 20;
     private final int RED_TAG = 24;
 
-    private final HashMap<Integer, String> motifIDs = new HashMap<Integer, String>();
+    private static final Map<Integer, SorterNode.NodeOption[]> MOTIF_MAP =
+            Map.of(
+                    21, new SorterNode.NodeOption[]{
+                            SorterNode.NodeOption.GREEN,
+                            SorterNode.NodeOption.PURPLE,
+                            SorterNode.NodeOption.PURPLE
+                    },
+                    22, new SorterNode.NodeOption[]{
+                            SorterNode.NodeOption.PURPLE,
+                            SorterNode.NodeOption.GREEN,
+                            SorterNode.NodeOption.PURPLE
+                    },
+                    23, new SorterNode.NodeOption[]{
+                            SorterNode.NodeOption.PURPLE,
+                            SorterNode.NodeOption.PURPLE,
+                            SorterNode.NodeOption.GREEN
+                    }
+            );
+
 
     private LLResult results;
     private boolean hasFoundMotifTag = false;
@@ -29,7 +50,7 @@ public class TurretSubsystem extends SubsystemBase{
 
     private List<LLResultTypes.FiducialResult> foundTags;
     private LLResultTypes.FiducialResult goalTag;
-    public static String gameMotif;
+    public static SorterNode.NodeOption[] gameMotif;
     private boolean isBlueAlliance;
 
     private double goal_tx;
@@ -52,10 +73,6 @@ public class TurretSubsystem extends SubsystemBase{
         m_limelight.setPollRateHz(POLL_RATE); //arbitrary for now
         m_limelight.pipelineSwitch(8);
         m_limelight.start();
-
-        motifIDs.put(21, "GPP");
-        motifIDs.put(22, "PGP");
-        motifIDs.put(23, "PPG");
 
         this.isBlueAlliance = isBlueAlliance;
         state = TurretVisionState.SEARCHING;
@@ -101,16 +118,19 @@ public class TurretSubsystem extends SubsystemBase{
     private boolean searchCheck() {
         for (LLResultTypes.FiducialResult curTag : foundTags) {
             int curID = curTag.getFiducialId();
-            if (motifIDs.containsKey(curTag.getFiducialId()) && !hasFoundMotifTag) {
-                gameMotif = motifIDs.get(curID);
+
+            //motif mapping
+            if (MOTIF_MAP.containsKey(curTag.getFiducialId()) && !hasFoundMotifTag) {
+                gameMotif = MOTIF_MAP.get(curID);
                 hasFoundMotifTag = true;
                 continue;
             }
+
             //blue check
             if (!hasFoundGoalTag) {
                 if (curID == BLUE_TAG && isBlueAlliance) {
                     goalTag = curTag;
-                    gameMotif = motifIDs.get(curTag.getFiducialId());
+                    gameMotif = MOTIF_MAP.get(curTag.getFiducialId());
                     hasFoundGoalTag = true;
                     continue;
                 }

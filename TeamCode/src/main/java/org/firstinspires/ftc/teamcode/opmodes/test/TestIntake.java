@@ -24,11 +24,10 @@ public class TestIntake extends CommandOpMode {
         register(m_intake);
 
         m_intake.setDefaultCommand(
-                new RunCommand(() -> m_intake.intake(), m_intake)
-        );
+                new RunCommand(() -> m_intake.intake(), m_intake));
 
-        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whileHeld(new InstantCommand(() -> m_intake.reverse(), m_intake));
+        m_driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> m_intake.reverse(), m_intake));
 
     }
 }

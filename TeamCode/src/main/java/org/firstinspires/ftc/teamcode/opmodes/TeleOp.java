@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.KickerCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ManualSorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ManualTurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;

@@ -4,7 +4,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.subsystems.ManualSorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
 
 public class KickerCommand extends SequentialCommandGroup {
 
@@ -14,9 +14,9 @@ public class KickerCommand extends SequentialCommandGroup {
         m_sorter = sorter;
 
         addCommands(
-                new InstantCommand(m_sorter::kickerUp),
+                new InstantCommand(m_sorter::kickerDown, m_sorter),
                 new WaitCommand(1150),
-                new InstantCommand(m_sorter::kickerReset)
+                new InstantCommand(m_sorter::kickerReset, m_sorter)
         );
     }
 }
