@@ -54,4 +54,9 @@ public abstract class CommandBase implements Command {
         m_subsystem = subsystem;
     }
 
+    public abstract void initialize();
+    public abstract void execute();
+    public abstract boolean isFinished();
+    public abstract void end(boolean interrupted);
+
 }
