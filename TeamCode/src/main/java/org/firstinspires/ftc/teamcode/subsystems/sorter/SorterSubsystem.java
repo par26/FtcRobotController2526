@@ -22,66 +22,40 @@ import java.util.Queue;
 @Configurable
 public class SorterSubsystem extends SubsystemBase {
 
-    private enum SorterState {
+    public enum SorterState {
         INTAKE,
         SHOOT
     }
 
-    private enum IntakeState {
-        INTAKING,
-        ALTERNATING,
-    }
+    private final RTPSubsystem m_rtp;
+    private final Servo m_kicker;
 
-    private enum ShootState {
-        TRANSFER,
-        SHOOT,
-        HOLD1,
-        HOLD2,
-    }
+    private final RevColorSensorV3 sensor1;
+    private final RevColorSensorV3 sensor2;
+    private final RevColorSensorV3 sensor3;
 
-    private CRServo m_servo;
-    private AnalogInput m_encoder;
-    private RTPSubsystem m_rtp;
+    public SorterNode sorterNode1;
+    public SorterNode sorterNode2;
+    public SorterNode sorterNode3;
 
-    private RevColorSensorV3 sensor1;
-    private RevColorSensorV3 sensor2;
-    private RevColorSensorV3 sensor3;
+    public SorterNode[] sorterNodes;
 
-    private SorterNode sorterNode1;
-    private SorterNode sorterNode2;
-    private SorterNode sorterNode3;
-
-    private SorterNode[] sorterNodes;
-
-    private SorterSubsystem.SorterState baseState;
-    private SorterSubsystem.IntakeState intakeState;
-    private SorterSubsystem.ShootState shootState;
-
-    private SorterNode.NodeOption[] motif;
-
-    public static int OFFSET_ANGLE = 15;
-    public static int NODE_ANGLE = 120;
-
-    private int deviation = 0;
-
-    //Kicker
-    public static double KICKER_ACTIVATE = 0.85;
-    public static double KICKER_RESET = 0;
-    public static double KICKER_HOLD_TIME = 0.25;
+    public SorterNode.NodeOption[] motif;
 
     private final ElapsedTime kickerTimer = new ElapsedTime();
 
-    private Servo m_kicker;
+    private SorterState state;
+
     private double curKickerAngle;
+    private int deviation;
 
-    public SorterSubsystem(HardwareMap hwMap, RTPSubsystem rtp) {
+    public SorterSubsystem(HardwareMap hwMap, RTPSubsystem rtp, boolean isIntakeState) {
         m_rtp = rtp;
-        m_encoder = hwMap.get(AnalogInput.class, "sorterEncoder");
-        m_kicker = hwMap.get(Servo.class, "kicker");
+        m_kicker = hwMap.get(Servo.class, SorterConstants.HW.KICKER);
 
-        sensor1 = hwMap.get(RevColorSensorV3.class, "node1");
-        sensor2 = hwMap.get(RevColorSensorV3.class, "node2");
-        sensor3 = hwMap.get(RevColorSensorV3.class, "node3");
+        sensor1 = hwMap.get(RevColorSensorV3.class, SorterConstants.HW.NODE1);
+        sensor2 = hwMap.get(RevColorSensorV3.class, SorterConstants.HW.NODE2);
+        sensor3 = hwMap.get(RevColorSensorV3.class, SorterConstants.HW.NODE3);
 
         sensor1.enableLed(true);
         sensor2.enableLed(true);
@@ -93,32 +67,45 @@ public class SorterSubsystem extends SubsystemBase {
 
         sorterNodes = new SorterNode[] {sorterNode1, sorterNode2, sorterNode3};
 
-        baseState = SorterState.INTAKE;
-        intakeState = IntakeState.INTAKING;
-        shootState = ShootState.HOLD1;
+        curKickerAngle = SorterConstants.Kicker.RESET_POS;
+        state = isIntakeState ? SorterState.INTAKE : SorterState.SHOOT;
+    }
+
+    //base states
+
+    public void switchState() {
+        state = isIntakeState() ? SorterState.SHOOT : SorterState.INTAKE;
+    }
+
+    public boolean isIntakeState() {
+        return state == SorterState.INTAKE;
+    }
+
+    public boolean isShootState() {
+        return state == SorterState.SHOOT;
     }
 
     //node angle changes
-
-    private void rotateC() {
-        m_rtp.changeAngle(NODE_ANGLE);
+    public void rotateC() {
+        m_rtp.changeAngle(SorterConstants.Index.NODE_ANGLE_DEG);
     }
-    private void rotateCC() {
-        m_rtp.changeAngle(-NODE_ANGLE);
+    public void rotateCC() {
+        m_rtp.changeAngle(-SorterConstants.Index.NODE_ANGLE_DEG);
     }
 
-    private double nodeToShoot(SorterNode node) {
-        double changeAngle = 0;
+    public void changeAngle(int angle) {m_rtp.changeAngle(angle);}
+    public int nodeToShoot(SorterNode node) {
+        int changeAngle = 0;
 
         if (node == sorterNode1) {
-            changeAngle -= OFFSET_ANGLE;
-            deviation -= OFFSET_ANGLE;
+            changeAngle -= SorterConstants.Index.OFFSET_ANGLE_DEG;
+            deviation -= SorterConstants.Index.OFFSET_ANGLE_DEG;
         } else if (node == sorterNode2) {
-            changeAngle += OFFSET_ANGLE;
-            deviation += OFFSET_ANGLE;
+            changeAngle += SorterConstants.Index.OFFSET_ANGLE_DEG;
+            deviation += SorterConstants.Index.OFFSET_ANGLE_DEG;
         } else {
-            changeAngle += OFFSET_ANGLE + NODE_ANGLE;
-            deviation += OFFSET_ANGLE;
+            changeAngle += SorterConstants.Index.OFFSET_ANGLE_DEG + SorterConstants.Index.NODE_ANGLE_DEG;
+            deviation += SorterConstants.Index.OFFSET_ANGLE_DEG;
         }
 
         return changeAngle;
@@ -126,111 +113,26 @@ public class SorterSubsystem extends SubsystemBase {
 
     //kicker methods
     public void kickerActivate() {
-        curKickerAngle = KICKER_ACTIVATE;
+        curKickerAngle = SorterConstants.Kicker.ACTIVATE_POS;
     }
-
     public void kickerReset() {
-        curKickerAngle = KICKER_RESET;
+        curKickerAngle = SorterConstants.Kicker.RESET_POS;
         m_rtp.changeAngle(-deviation);
     }
 
-    //state handlers
-
-    //1. toggle, 2nd. forced
-    public void switchBaseState() {
-        this.baseState = (baseState == SorterState.INTAKE) ? SorterState.SHOOT : SorterState.INTAKE;
-    }
-    public void switchBaseState(SorterState state) {
-        this.baseState = state;
-    }
-
-    private void intakeStateHandler() {
-        if (sorterNode1.getStoredNode() != SorterNode.NodeOption.EMPTY
-                && sorterNode3.getStoredNode() != SorterNode.NodeOption.EMPTY) {
-            switchBaseState(SorterState.SHOOT);
-        }
-
-        switch (intakeState) {
-            case INTAKING:
-                if (!isOccupied(sorterNode2)) {
-                    intakeState = IntakeState.ALTERNATING;
-                    rotateCC();
-                }
-                break;
-            case ALTERNATING:
-                if (m_rtp.isAtTarget()) {
-                    intakeState = IntakeState.INTAKING;
-                }
-                break;
-        }
-    }
-
-    private boolean shooterStateHandler() {
-        //switchstate if out of balls in sorter
-        if (isEmpty()) {
-            return true;
-        }
-
-        //order recalced each loop, only use index 0
-        SorterNode[] order = getNodeOrder(sorterNodes ,motif);
-
-        switch (shootState) {
-            case TRANSFER:
-                m_rtp.changeAngle(nodeToShoot(order[0]));
-                shootState = ShootState.SHOOT;
-                break;
-            case SHOOT:
-                if (m_rtp.isAtTarget()) {
-                    kickerActivate();
-                    kickerTimer.reset();
-                    shootState = ShootState.HOLD1;
-                }
-                break;
-            case HOLD1:
-                if (kickerTimer.seconds() >= KICKER_HOLD_TIME) {
-                    kickerReset();
-                    kickerTimer.reset();
-                    shootState = ShootState.HOLD2;
-                }
-
-                break;
-            case HOLD2:
-                if (kickerTimer.seconds() >= KICKER_HOLD_TIME) {
-                    shootState = ShootState.TRANSFER;
-                }
-                break;
-        }
-
-        return false;
-    }
-
     //utility
+    public boolean isAtTarget() {return m_rtp.isAtTarget();}
 
-    private boolean isOccupied(SorterNode node) {
+    public boolean isOccupied(SorterNode node) {
         return node.getStoredNode() != SorterNode.NodeOption.EMPTY;
     }
-    private boolean isEmpty() {
-        if (!isOccupied(sorterNode1)
+    public boolean isEmpty() {
+        return !isOccupied(sorterNode1)
                 && !isOccupied(sorterNode2)
-                && !isOccupied(sorterNode3)) {
-            return true;
-        }
-        return false;
+                && !isOccupied(sorterNode3);
     }
-    private SorterNode.NodeOption checkNode(RevColorSensorV3 node) {
-        NormalizedRGBA n = node.getNormalizedColors();
-        float[] hsv = new float[3];
-        int argb = n.toColor();
-        Color.colorToHSV(argb, hsv);
-
-        float hue = hsv[0];
-
-        boolean isGreen = hue >= 140 && hue <= 180;
-        boolean isPurple = hue >= 200 && hue <= 280;
-
-        if (isGreen) return SorterNode.NodeOption.GREEN;
-        if (isPurple) return SorterNode.NodeOption.PURPLE;
-        return SorterNode.NodeOption.EMPTY;
+    public boolean isFull() {
+        return isOccupied(sorterNode1) && isOccupied(sorterNode3);
     }
     private void updateNodes() {
         SorterNode.NodeOption raw1 = checkNode(sensor1);
@@ -240,6 +142,21 @@ public class SorterSubsystem extends SubsystemBase {
         sorterNode1.setNode(node1Filter.update(raw1));
         sorterNode2.setNode(node2Filter.update(raw2));
         sorterNode3.setNode(node3Filter.update(raw3));
+    }
+    private SorterNode.NodeOption checkNode(RevColorSensorV3 node) {
+        NormalizedRGBA n = node.getNormalizedColors();
+        float[] hsv = new float[3];
+        int argb = n.toColor();
+        Color.colorToHSV(argb, hsv);
+
+        float hue = hsv[0];
+
+        boolean isGreen = hue >= SorterConstants.Detect.GREEN_HUE_MIN && hue <= SorterConstants.Detect.GREEN_HUE_MAX;
+        boolean isPurple = hue >= SorterConstants.Detect.PURPLE_HUE_MIN && hue <= SorterConstants.Detect.PURPLE_HUE_MAX;
+
+        if (isGreen) return SorterNode.NodeOption.GREEN;
+        if (isPurple) return SorterNode.NodeOption.PURPLE;
+        return SorterNode.NodeOption.EMPTY;
     }
 
     /* Possible variants
@@ -253,7 +170,7 @@ public class SorterSubsystem extends SubsystemBase {
     * [...]
      */
     //returns whole array, but only uses index 0 b/c we want to preserve order
-    private SorterNode[] getNodeOrder(SorterNode[] input, SorterNode.NodeOption[] target) {
+    public SorterNode[] getNodeOrder(SorterNode[] input, SorterNode.NodeOption[] target) {
         Queue<SorterNode> greens = new ArrayDeque<>();
         Queue<SorterNode> purples = new ArrayDeque<>();
         Queue<SorterNode> empties = new ArrayDeque<>();
@@ -301,16 +218,6 @@ public class SorterSubsystem extends SubsystemBase {
         m_kicker.setPosition(curKickerAngle);
 
         if (motif == null) {motif = TurretSubsystem.gameMotif;}
-
-        switch (baseState) {
-            case INTAKE:
-                intakeStateHandler();
-                break;
-            case SHOOT:
-                boolean bool2 = shooterStateHandler();
-                if (bool2) baseState = SorterState.INTAKE;
-                break;
-        }
     }
 
     private final StableNodeFilter node1Filter = new StableNodeFilter(4, 6);
