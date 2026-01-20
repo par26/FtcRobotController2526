@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
-import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
@@ -12,7 +11,7 @@ import org.firstinspires.ftc.teamcode.commands.KickerCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ManualTurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.turret.ManualTurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
 
@@ -42,7 +41,7 @@ public class ManualTeleOp extends CommandOpMode {
         m_rtp = new RTPSubsystem(hardwareMap);
 
         m_sorter = new ManualSorterSubsystem(hardwareMap, m_rtp);
-        m_turret = new ManualTurretSubsystem(hardwareMap);
+        m_turret = new ManualTurretSubsystem(hardwareMap, telemetry);
 
         register(m_drive, m_intake, m_outtake, m_turret, m_rtp, m_sorter);
 
@@ -57,9 +56,9 @@ public class ManualTeleOp extends CommandOpMode {
                 )
         );
 
-        m_turret.setDefaultCommand(
-                new RunCommand(() -> m_turret.setPower(
-                        () -> m_driver2.getRightX()), m_turret));
+//        m_turret.setDefaultCommand(
+//                new RunCommand(() -> m_turret.setPower(
+//                        () -> m_driver2.getRightX()), m_turret));
 
         m_driver1.getGamepadButton(GamepadKeys.Button.B)
                 .whenPressed(new InstantCommand(() -> m_outtake.spin(true), m_outtake));

@@ -14,7 +14,7 @@ public class KickerCommand extends SequentialCommandGroup {
         m_sorter = sorter;
 
         addCommands(
-                new InstantCommand(m_sorter::kickerDown, m_sorter),
+                new InstantCommand(m_sorter::kickerActivate, m_sorter),
                 new WaitCommand(1150),
                 new InstantCommand(m_sorter::kickerReset, m_sorter)
         );

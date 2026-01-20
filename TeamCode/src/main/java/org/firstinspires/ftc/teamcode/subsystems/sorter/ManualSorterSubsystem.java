@@ -13,12 +13,6 @@ public class ManualSorterSubsystem extends SubsystemBase {
     private RTPSubsystem m_rtp;
     private Servo m_servo;
 
-    public static double KICKER_DOWN = 0.85;
-    public static double KICKER_RESET = 0;
-
-    public static int OFFSET_ANGLE = 15;
-    public static int NODE_ANGLE = 120;
-
     private int deviation = 0;
     private double curKickerAngle;
 
@@ -26,39 +20,39 @@ public class ManualSorterSubsystem extends SubsystemBase {
         m_rtp = rtp;
         m_servo = hwMap.get(Servo.class, "kicker");
 
-        curKickerAngle = KICKER_RESET;
+        curKickerAngle = SorterConstants.Kicker.RESET_POS;
     }
 
-    public void kickerDown() {
-        curKickerAngle = KICKER_DOWN;
+    public void kickerActivate() {
+        curKickerAngle = SorterConstants.Kicker.ACTIVATE_POS;
     }
 
     public void kickerReset() {
-        curKickerAngle = KICKER_RESET;
+        curKickerAngle = SorterConstants.Kicker.RESET_POS;
         m_rtp.changeAngle(-deviation);
     }
 
     public void rotateCC() {
-        m_rtp.changeAngle(-NODE_ANGLE);
+        m_rtp.changeAngle(-SorterConstants.Index.NODE_ANGLE_DEG);
     }
 
     public void rotateC() {
-        m_rtp.changeAngle(NODE_ANGLE);
+        m_rtp.changeAngle(SorterConstants.Index.NODE_ANGLE_DEG);
     }
 
     public void leftOffset() {
         if (deviation < 0) return;
 
-        m_rtp.changeAngle(-OFFSET_ANGLE);
-        deviation -= OFFSET_ANGLE;
+        m_rtp.changeAngle(-SorterConstants.Index.OFFSET_ANGLE_DEG);
+        deviation -= SorterConstants.Index.OFFSET_ANGLE_DEG;
 
     }
 
     public void rightOffset() {
         if (deviation > 0) return;
 
-        m_rtp.changeAngle(OFFSET_ANGLE);
-        deviation += OFFSET_ANGLE;
+        m_rtp.changeAngle(SorterConstants.Index.OFFSET_ANGLE_DEG);
+        deviation += SorterConstants.Index.OFFSET_ANGLE_DEG;
 
     }
 

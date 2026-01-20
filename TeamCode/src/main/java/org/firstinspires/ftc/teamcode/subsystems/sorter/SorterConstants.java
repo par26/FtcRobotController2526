@@ -7,6 +7,13 @@ public class SorterConstants {
 
     private SorterConstants() {};
 
+    public static Sorter sorter = new Sorter();
+    public static class Sorter {
+        public Detect detect = new Detect();
+        public Index index = new Index();
+        public Kicker kicker = new Kicker();
+    }
+
     /** Hardware Names */
     public static final class HW {
         public static final String ENCODER = "sorterEncoder";
@@ -25,16 +32,12 @@ public class SorterConstants {
 
         public static double PURPLE_HUE_MIN = 200;
         public static double PURPLE_HUE_MAX = 280;
-
-        private Detect() {}
     }
 
     /** Sorter rotation / indexing behavior */
     public static final class Index {
         public static int OFFSET_ANGLE_DEG = 15;   // node1/node2 offset
         public static int NODE_ANGLE_DEG   = 120;  // spacing between nodes
-
-        private Index() {}
     }
 
     /** Kicker servo positions + timing */
@@ -44,7 +47,5 @@ public class SorterConstants {
 
         // Use seconds if your code uses ElapsedTime.seconds()
         public static long HOLD_TIME_MS  = 2500;
-
-        private Kicker() {}
     }
 }
