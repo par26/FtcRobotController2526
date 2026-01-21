@@ -181,7 +181,6 @@
             updateTargetTicks();
             m_motor.setTargetPosition(targetTicks);
             m_motor.set(TurretConstants.ROTATE.HOLD_POWER);
-            log();
         }
 
         private void log() {

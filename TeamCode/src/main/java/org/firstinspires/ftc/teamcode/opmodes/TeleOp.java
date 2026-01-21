@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.sorter.SorterIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.sorter.SorterShootCommand;
-import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSubsystem;
 
 public class TeleOp extends CommandOpMode {

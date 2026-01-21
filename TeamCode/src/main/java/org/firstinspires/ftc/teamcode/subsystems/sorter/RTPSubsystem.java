@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.sorter;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 
 @Configurable
 public class RTPSubsystem extends SubsystemBase {
@@ -23,8 +24,8 @@ public class RTPSubsystem extends SubsystemBase {
     public static double kD = 0.0015;
 
     public RTPSubsystem(HardwareMap hwMap) {
-        m_encoder = new AbsoluteAnalogEncoder(hwMap, "sorterEncoder");
-        m_servo = new CRServoEx(hwMap, "sorterServo", m_encoder, CRServoEx.RunMode.OptimizedPositionalControl);
+        m_encoder = new AbsoluteAnalogEncoder(hwMap, SorterConstants.HW.ENCODER);
+        m_servo = new CRServoEx(hwMap, SorterConstants.HW.SERVO, m_encoder, CRServoEx.RunMode.OptimizedPositionalControl);
 
         m_servo.setPIDF(new PIDFCoefficients(kP, kI, kD, 0));
         m_servo.set(Math.toRadians(0));

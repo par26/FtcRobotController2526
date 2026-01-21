@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
 import org.firstinspires.ftc.teamcode.util.SorterNode;
@@ -168,7 +167,7 @@ public class SorterSubsystem extends SubsystemBase {
     * [...]
      */
     //returns whole array, but only uses index 0 b/c we want to preserve order
-    public SorterNode[] getNodeOrder(SorterNode[] input, SorterNode.NodeOption[] target) {
+    public SorterNode[] getNodeOrder() {
         Queue<SorterNode> greens = new ArrayDeque<>();
         Queue<SorterNode> purples = new ArrayDeque<>();
         Queue<SorterNode> empties = new ArrayDeque<>();
@@ -176,7 +175,7 @@ public class SorterSubsystem extends SubsystemBase {
         SorterNode[] out = new SorterNode[3];
 
         //first in first out
-        for (SorterNode n : input) {
+        for (SorterNode n : sorterNodes) {
             switch (n.getStoredNode()) {
                 case GREEN: greens.add(n);break;
                 case PURPLE: purples.add(n);break;
@@ -186,7 +185,7 @@ public class SorterSubsystem extends SubsystemBase {
 
         //try to match as many to target node
         for (int i = 0; i < 3; i++) {
-            SorterNode.NodeOption desired = target[i];
+            SorterNode.NodeOption desired = motif[i];
             if (desired == SorterNode.NodeOption.GREEN && !greens.isEmpty()) {
                 out[i] = greens.poll();
             } else if (desired == SorterNode.NodeOption.PURPLE && !purples.isEmpty()) {

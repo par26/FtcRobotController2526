@@ -17,6 +17,7 @@ public class SorterConstants {
     /** Hardware Names */
     public static final class HW {
         public static final String ENCODER = "sorterEncoder";
+        public static final String SERVO = "sorterServo";
         public static final String KICKER  = "kicker";
         public static final String NODE1   = "node1";
         public static final String NODE2   = "node2";

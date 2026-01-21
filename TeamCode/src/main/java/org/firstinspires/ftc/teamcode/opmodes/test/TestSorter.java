@@ -5,9 +5,9 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.commands.KickerCommand;
+import org.firstinspires.ftc.teamcode.commands.sorter.KickerCommand;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
 
 @TeleOp(group="test")
 public class TestSorter extends CommandOpMode {

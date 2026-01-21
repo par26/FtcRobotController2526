@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
 
 @TeleOp(name = "Cont. Rotation Axon Test", group = "test")
 public class TestRTPAxon extends CommandOpMode {

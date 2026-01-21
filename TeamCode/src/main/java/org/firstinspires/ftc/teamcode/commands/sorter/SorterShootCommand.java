@@ -37,7 +37,7 @@ public class SorterShootCommand extends CommandBase {
     public void execute() {
 
         //order recalced each loop, only use index 0
-        SorterNode[] order = m_sorter.getNodeOrder(m_sorter.sorterNodes ,m_sorter.motif);
+        SorterNode[] order = m_sorter.getNodeOrder();
 
         switch (state) {
             case TRANSFER:

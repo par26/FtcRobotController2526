@@ -2,18 +2,17 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.commands.KickerCommand;
+import org.firstinspires.ftc.teamcode.commands.sorter.KickerCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.turret.ManualTurretSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.RTPSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class ManualTeleOp extends CommandOpMode {
