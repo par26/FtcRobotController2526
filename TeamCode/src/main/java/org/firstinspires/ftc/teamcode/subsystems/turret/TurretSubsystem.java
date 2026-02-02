@@ -170,9 +170,10 @@
         public double calculateTurretAngle(Pose currentPose, Pose goalPose) {
             Pose turretPoseRelativeToRobot = getAdjustedPose(currentPose, 12);
 
-        public static double calculateTurretAngle(Pose currentPose, Pose goalPose, double currentTurretAngle) {
-            double deltaX = goalPose.getX() - currentPose.getX();
-            double deltaY = goalPose.getY() - currentPose.getY();
+            m_telemetry.addData("turretPoseX", turretPoseRelativeToRobot.getX());
+            m_telemetry.addData("turretPoseY", turretPoseRelativeToRobot.getY());
+            double deltaX = goalPose.getX() - turretPoseRelativeToRobot.getX();
+            double deltaY = goalPose.getY() - turretPoseRelativeToRobot.getY();
 
             // Absolute angle to target
             double absoluteAngleToTarget = Math.toDegrees(Math.atan2(deltaY, deltaX));
