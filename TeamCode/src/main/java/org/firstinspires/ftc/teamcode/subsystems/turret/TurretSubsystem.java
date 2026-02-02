@@ -187,8 +187,11 @@
 
             turretAngleToTarget = AngularUtil.wrap360(turretAngleToTarget);
 
-            double offset = turretAngleToTarget - currentTurretAngle;
-            double turretDelta = AngularUtil.turretDelta(currentTurretAngle, offset);
+            return turretAngleToTarget;
+        }
+        public static Pose getAdjustedPose(Pose currentPose, double offsetDistanceCm) {
+            double headingRad = currentPose.getHeading();
+            offsetDistanceCm /= 2.54;
 
             return currentTurretAngle + turretDelta;
         }
