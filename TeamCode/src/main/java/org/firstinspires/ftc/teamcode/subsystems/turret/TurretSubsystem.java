@@ -193,7 +193,11 @@
             double headingRad = currentPose.getHeading();
             offsetDistanceCm /= 2.54;
 
-            return currentTurretAngle + turretDelta;
+            double offsetX = -offsetDistanceCm * Math.cos(headingRad);
+            double offsetY = -offsetDistanceCm * Math.sin(headingRad);
+
+            return new Pose(currentPose.getX() + offsetX, currentPose.getY() + offsetY, currentPose.getHeading()
+            );
         }
 
         //TODO: Update current angle depending on offset applied
