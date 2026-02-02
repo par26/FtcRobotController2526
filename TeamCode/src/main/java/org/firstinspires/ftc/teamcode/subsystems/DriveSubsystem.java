@@ -9,8 +9,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final Follower follower;
 
-    public DriveSubsystem(HardwareMap hwMap) {
-        follower = Constants.createFollower(hwMap);
+    public DriveSubsystem(HardwareMap hwMap, Follower follower) {
+        this.follower = follower;
     }
 
     public void startTeleOp() {

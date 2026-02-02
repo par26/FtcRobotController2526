@@ -1,16 +1,12 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.old;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.MoveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.old.MoveSubsystem;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="EventAuto")
 //temporary autonomous to move forward & gain points
 public class Auto extends CommandOpMode {
 

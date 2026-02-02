@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
-import org.firstinspires.ftc.teamcode.subsystems.turret.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.util.MatchConstants;
 import org.firstinspires.ftc.teamcode.util.SorterNode;
 
 import java.util.ArrayDeque;
@@ -214,7 +214,7 @@ public class SorterSubsystem extends SubsystemBase {
         updateNodes();
         m_kicker.setPosition(curKickerAngle);
 
-        if (motif == null) {motif = TurretSubsystem.gameMotif;}
+        if (motif == null) {motif = MatchConstants.matchMotif;}
     }
 
     private final StableNodeFilter node1Filter = new StableNodeFilter(4, 6);

@@ -11,6 +11,7 @@ public class TurretConstants {
     public static class Turret {
         public ROTATE rotate = new ROTATE();
         public SEARCH search = new SEARCH();
+        public VISION vision = new VISION();
     }
 
     public static class HW {
@@ -21,13 +22,12 @@ public class TurretConstants {
     }
 
     public static class VISION {
-        public static int POLL_RATE = 100;
+        public static int POLL_RATE = 250;
     }
 
     //tuned :checkmark:
     public static class ROTATE {
-        public static double HOLD_POWER = 0.90;
-        public static double SEARCH_POWER = 0.90;
+        public static double POWER = 0.60;
         public static double kP = 0.02;
         public static double TOLERANCE = 15;
     }

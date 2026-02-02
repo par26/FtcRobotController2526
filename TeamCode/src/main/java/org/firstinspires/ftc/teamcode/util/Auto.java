@@ -1,21 +1,14 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
-import static org.firstinspires.ftc.teamcode.subsystems.FieldConstants.*;
+import static org.firstinspires.ftc.teamcode.util.FieldConstants.*;
 
 
 public class Auto {
 
     private Follower m_follower;
-
-    public enum RobotStart {
-        FAR,
-        CLOSE,
-        TEST
-    }
-    private RobotStart startlocation;
 
     //Poses
     public Pose startPose, preloadPose;
@@ -27,10 +20,8 @@ public class Auto {
     }
 
     private void createPoses() {
-        switch (startlocation) {
+        switch (MatchConstants.startLocation) {
             case FAR:
-                startPose = farStartPose;
-                preloadPose = closePreloadPose;
 
                 break;
             case CLOSE:

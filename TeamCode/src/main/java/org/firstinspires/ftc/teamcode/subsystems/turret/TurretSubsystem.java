@@ -2,6 +2,8 @@
 
     import com.bylazar.configurables.annotations.Configurable;
     import com.bylazar.configurables.annotations.IgnoreConfigurable;
+    import com.pedropathing.follower.Follower;
+    import com.pedropathing.geometry.Pose;
     import com.qualcomm.hardware.limelightvision.LLResult;
     import com.qualcomm.hardware.limelightvision.LLResultTypes;
     import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -11,6 +13,8 @@
     import org.firstinspires.ftc.robotcore.external.Telemetry;
     import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
     import org.firstinspires.ftc.teamcode.util.AngularUtil;
+    import org.firstinspires.ftc.teamcode.util.FieldConstants;
+    import org.firstinspires.ftc.teamcode.util.MatchConstants;
     import org.firstinspires.ftc.teamcode.util.SorterNode;
 
     import java.util.List;
@@ -22,6 +26,7 @@
         private final Limelight3A m_limelight;
         private final Motor m_motor;
         private final Telemetry m_telemetry;
+        private Follower m_follower;
 
         private final int BLUE_TAG = 20;
         private final int RED_TAG = 24;
@@ -45,36 +50,35 @@
                         }
                 );
 
+        private enum TurretState {
+            SEARCHING,
+            LOCKED
+        }
+        private TurretState state;
+        private Pose targetPose;
 
         private LLResult results;
         private boolean foundMotifTag = false;
         private boolean foundGoalTag = false;
 
         private List<LLResultTypes.FiducialResult> foundTags;
-        private LLResultTypes.FiducialResult goalTag;
         @IgnoreConfigurable
-        public static SorterNode.NodeOption[] gameMotif;
-        private boolean isBlueAlliance;
 
-        private int goal_tx;
-
-        private enum TurretVisionState {
-            SEARCHING,
-            LOCKED
-        }
-        private TurretVisionState state;
-
-        private int targetAngle;
+        private double targetAngle;
+        private double currentAngle;
         private int targetTicks;
 
+        private double initialAngle;
         //TODO: boolean value for alliance side
 
-        public TurretSubsystem(HardwareMap hwMap, boolean isBlueAlliance, Telemetry telemetry) {
+        public TurretSubsystem(HardwareMap hwMap, Telemetry telemetry, Follower follower) {
             m_limelight = hwMap.get(Limelight3A.class, TurretConstants.HW.LIMELIGHT);
             m_motor = new Motor(hwMap, TurretConstants.HW.MOTOR,28, 435);
             m_telemetry = telemetry;
+            m_follower = follower;
 
             m_motor.setRunMode(Motor.RunMode.PositionControl);
+            m_motor.setInverted(true);
             m_motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
             m_motor.setPositionCoefficient(TurretConstants.ROTATE.kP);
             m_motor.setPositionTolerance(TurretConstants.ROTATE.TOLERANCE);
@@ -84,33 +88,44 @@
             m_limelight.pipelineSwitch(8);
             m_limelight.start();
 
-            this.isBlueAlliance = isBlueAlliance;
-            state = TurretVisionState.SEARCHING;
+            state = TurretState.SEARCHING;
+            targetPose = FieldConstants.obeliskPose;
+            currentAngle = AngularUtil.wrap360(Math.toDegrees(MatchConstants.startPose.getHeading()) - 90);
+//            initialAngle = AngularUtil.wrap360(Math.toDegrees(MatchConstants.startPose.getHeading()) - 90);
         }
 
-        /*
-         * Order of Operations
-         * 1. Search for obelisk & goal
-         * 2. Verify that motif is found
-         * 3. Verify that goal tag is current alliance goal
-         * 4. Lock onto goal tag
-        */
-
-        private void search() {
-            if (m_motor.atTargetPosition()) {
-                targetAngle += 15;
-            }
-        }
-        private void lock() {
-            goal_tx = (int) goalTag.getTargetXDegrees();
-            m_telemetry.addData("TargetX Degrees", goal_tx);
-
-            if (m_motor.atTargetPosition()) {
-                targetAngle += goal_tx;
-            }
-
-        }
-
+//        /**
+//         * Set desired turret angle [0-360] (avoids repeated spinning)
+//         * @param angle degrees [0-360]
+//         */
+//        public void setClosestAngle(double angle) {
+//            double currentAngle = ticksToDegrees(m_motor.getCurrentPosition());
+//            double wrappedCurrent = AngularUtil.wrap360(currentAngle);
+//        }
+//
+//        /**
+//         * Increment turret angle [0-360]
+//         * @param angle degrees [0-360]
+//         */
+//        public void incrementAngle(double angle) {
+//
+//        }
+//        private void search() {
+//            int increment = 20;
+//            if (m_motor.atTargetPosition()) {
+//                targetAngle += isLastRight ? increment : -increment;
+//            }
+//        }
+//        private void lock() {
+//            goal_tx = (int) goalTag.getTargetXDegrees();
+//            isLastRight = goal_tx > 0;
+//            m_telemetry.addData("TargetX Degrees", goal_tx);
+//
+//            if (m_motor.atTargetPosition()) {
+//                targetAngle += goal_tx;
+//            }
+//
+//        }
         //checking if found game motif & if goal wanted found
         private void scanTags() {
             foundGoalTag = false;
@@ -119,19 +134,17 @@
 
                 //motif mapping
                 if (MOTIF_MAP.containsKey(curID) && !foundMotifTag) {
-                    gameMotif = MOTIF_MAP.get(curID);
+                    MatchConstants.matchMotif = MOTIF_MAP.get(curID);
                     foundMotifTag = true;
                     continue;
                 }
 
-                if (curID == BLUE_TAG && isBlueAlliance) {
-                    goalTag = curTag;
+                if (curID == BLUE_TAG && MatchConstants.isBlueAlliance) {
                     foundGoalTag = true;
                     break;
                 }
 
-                if (curID == RED_TAG && !isBlueAlliance) {
-                    goalTag = curTag;
+                if (curID == RED_TAG && !MatchConstants.isBlueAlliance) {
                     foundGoalTag = true;
                 }
 
@@ -140,58 +153,93 @@
         }
 
         /* angle updates */
-        public static double ticksToDegrees(double ticks) {
-            return ticks * (360.0 / 384.5);
-        }
-        public static int degreesToTicks(double degrees) {
-            return (int) Math.round(degrees * (384.5 / 360.0));
-        }
-        public double getAngle() {
-            return ticksToDegrees(m_motor.getCurrentPosition());
-        }
-        public void updateTargetTicks() {
-            double current = AngularUtil.wrap360(getAngle());
-            double delta = AngularUtil.turretDelta(current, AngularUtil.wrap360(targetAngle) - current);
+        static final double MOTOR_TICKS_PER_REV = 384.5;
+        static final double EXTERNAL_GEAR_RATIO = 4.6925; // motor revs per turret rev
 
-            targetTicks = degreesToTicks(current + delta);
+        static final double TICKS_PER_TURRET_REV =
+                MOTOR_TICKS_PER_REV * EXTERNAL_GEAR_RATIO;
+
+        public static double ticksToDegrees(double ticks) {
+            return ticks * (360.0 / TICKS_PER_TURRET_REV);
+        }
+
+        public static int degreesToTicks(double degrees) {
+            return (int) Math.round(degrees * (TICKS_PER_TURRET_REV / 360.0));
+        }
+
+
+        public static double calculateTurretAngle(Pose currentPose, Pose goalPose, double currentTurretAngle) {
+            double deltaX = goalPose.getX() - currentPose.getX();
+            double deltaY = goalPose.getY() - currentPose.getY();
+
+            // Absolute angle to target
+            double absoluteAngleToTarget = Math.toDegrees(Math.atan2(deltaY, deltaX));
+
+            // Robot's heading
+            double robotHeading = AngularUtil.wrap360(Math.toDegrees(currentPose.getHeading()));
+
+            // Turret 0° points at (robot heading - 90°)
+            // So turret angle = (target angle) - (robot heading - 90°)
+            double turretAngleToTarget = absoluteAngleToTarget - (robotHeading - 90.0);
+
+            turretAngleToTarget = AngularUtil.wrap360(turretAngleToTarget);
+
+            double offset = turretAngleToTarget - currentTurretAngle;
+            double turretDelta = AngularUtil.turretDelta(currentTurretAngle, offset);
+
+            return currentTurretAngle + turretDelta;
+        }
+
+        //TODO: Update current angle depending on offset applied
+        public void updateTargetTicks() {
+            targetAngle = calculateTurretAngle(m_follower.getPose(), targetPose, currentAngle);
+            currentAngle = targetAngle;
+            targetTicks = degreesToTicks(targetAngle);
+            m_telemetry.addData("Target Angle", targetAngle);
+
         }
 
         @Override
         public void periodic() {
+            m_follower.update();
             results = m_limelight.getLatestResult();
-            if (results != null && results.isValid()) {
-                foundTags = results.getFiducialResults();
-                scanTags();
-            }
+            foundTags = results.getFiducialResults();
+            scanTags();
 
-            state = (foundGoalTag && foundMotifTag) ? TurretVisionState.LOCKED : TurretVisionState.SEARCHING;
+            state = (foundMotifTag) ? TurretState.LOCKED : TurretState.SEARCHING;
 
             switch (state) {
                 case SEARCHING:
-                    search();
-                    m_telemetry.addLine("Vision: Searching");
+                    targetPose = FieldConstants.obeliskPose;
+                    m_telemetry.addLine("Turret: Searching");
 
                     break;
                 case LOCKED:
-                    lock();
-                    m_telemetry.addLine("Vision: Locked");
+                    targetPose = MatchConstants.isBlueAlliance ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
+                    m_telemetry.addLine("Turret: Locked");
                     break;
             }
 
             updateTargetTicks();
             m_motor.setTargetPosition(targetTicks);
-            m_motor.set(TurretConstants.ROTATE.HOLD_POWER);
+            m_motor.set(TurretConstants.ROTATE.POWER);
+            log();
         }
 
         private void log() {
 
-            m_telemetry.addData("Target Angle:", targetAngle);
-            m_telemetry.addData("Motor Angle:", ticksToDegrees(m_motor.getCurrentPosition()));
-            m_telemetry.addData("Target Ticks:", targetTicks);
+//            m_telemetry.addData("Done Searching", foundMotifTag ? "✔️" : "✖️");
+//            m_telemetry.addData("Target Angle:", targetAngle);
+//            m_telemetry.addData("Motor Angle:", ticksToDegrees(m_motor.getCurrentPosition()));
+//            m_telemetry.addData("Current Angle:", currentAngle);
+//            m_telemetry.addData("Initial Angle:", initialAngle);
+//            m_telemetry.addData("Target Ticks:", targetTicks);
             m_telemetry.addData("Motor Ticks:", m_motor.getCurrentPosition());
-            m_telemetry.addData("Wrapped Target Angle", AngularUtil.wrap360(targetAngle));
-            m_telemetry.addData("Wrapped Motor Angle", AngularUtil.wrap360(ticksToDegrees(m_motor.getCurrentPosition())));
-            m_telemetry.addData("kP", m_motor.getPositionCoefficient());
+//            m_telemetry.addData("Wrapped Target Angle", AngularUtil.wrap360(targetAngle));
+//            m_telemetry.addData("Wrapped Motor Angle", AngularUtil.wrap360(ticksToDegrees(m_motor.getCurrentPosition())));
+            m_telemetry.addData("X:", m_follower.getPose().getX());
+            m_telemetry.addData("Y:", m_follower.getPose().getY());
+            m_telemetry.addData("H:", AngularUtil.wrap360(Math.toDegrees(m_follower.getPose().getHeading())));
 
             m_telemetry.update();
         }
