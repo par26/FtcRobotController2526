@@ -167,6 +167,8 @@
             return (int) Math.round(degrees * (TICKS_PER_TURRET_REV / 360.0));
         }
 
+        public double calculateTurretAngle(Pose currentPose, Pose goalPose) {
+            Pose turretPoseRelativeToRobot = getAdjustedPose(currentPose, 12);
 
         public static double calculateTurretAngle(Pose currentPose, Pose goalPose, double currentTurretAngle) {
             double deltaX = goalPose.getX() - currentPose.getX();
