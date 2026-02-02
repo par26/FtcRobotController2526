@@ -90,8 +90,6 @@
 
             state = TurretState.SEARCHING;
             targetPose = FieldConstants.obeliskPose;
-            currentAngle = AngularUtil.wrap360(Math.toDegrees(MatchConstants.startPose.getHeading()) - 90);
-//            initialAngle = AngularUtil.wrap360(Math.toDegrees(MatchConstants.startPose.getHeading()) - 90);
         }
 
 //        /**
@@ -153,11 +151,10 @@
         }
 
         /* angle updates */
-        static final double MOTOR_TICKS_PER_REV = 384.5;
-        static final double EXTERNAL_GEAR_RATIO = 4.6925; // motor revs per turret rev
+        static double MOTOR_TICKS_PER_REV = 384.5;
+        public static double EXTERNAL_GEAR_RATIO = 4.8; // motor revs per turret rev
 
-        static final double TICKS_PER_TURRET_REV =
-                MOTOR_TICKS_PER_REV * EXTERNAL_GEAR_RATIO;
+        static double TICKS_PER_TURRET_REV = MOTOR_TICKS_PER_REV * EXTERNAL_GEAR_RATIO;
 
         public static double ticksToDegrees(double ticks) {
             return ticks * (360.0 / TICKS_PER_TURRET_REV);
@@ -175,20 +172,23 @@
             double deltaX = goalPose.getX() - turretPoseRelativeToRobot.getX();
             double deltaY = goalPose.getY() - turretPoseRelativeToRobot.getY();
 
-            // Absolute angle to target
+            //translational angle adjustment
             double absoluteAngleToTarget = Math.toDegrees(Math.atan2(deltaY, deltaX));
-
-            // Robot's heading
+            m_telemetry.addData("Translational Angle To Target", absoluteAngleToTarget);
+            m_telemetry.addData("Dx", deltaX);
+            m_telemetry.addData("Dy", deltaY);
             double robotHeading = AngularUtil.wrap360(Math.toDegrees(currentPose.getHeading()));
 
-            // Turret 0° points at (robot heading - 90°)
-            // So turret angle = (target angle) - (robot heading - 90°)
+            // turret angle = (target angle) - (robot heading - 90°)
+            m_telemetry.addData("Robot Heading", robotHeading);
             double turretAngleToTarget = absoluteAngleToTarget - (robotHeading - 90.0);
 
             turretAngleToTarget = AngularUtil.wrap360(turretAngleToTarget);
+            m_telemetry.addData("Relative Angle to Target", turretAngleToTarget);
 
-            return turretAngleToTarget;
+            return turretAngleToTarget;     
         }
+
         public static Pose getAdjustedPose(Pose currentPose, double offsetDistanceCm) {
             double headingRad = currentPose.getHeading();
             offsetDistanceCm /= 2.54;
@@ -200,13 +200,10 @@
             );
         }
 
-        //TODO: Update current angle depending on offset applied
         public void updateTargetTicks() {
-            targetAngle = calculateTurretAngle(m_follower.getPose(), targetPose, currentAngle);
-            currentAngle = targetAngle;
-            targetTicks = degreesToTicks(targetAngle);
-            m_telemetry.addData("Target Angle", targetAngle);
-
+            targetAngle = calculateTurretAngle(m_follower.getPose(), targetPose);
+            currentAngle = ticksToDegrees(m_motor.getCurrentPosition());
+            targetTicks = degreesToTicks(AngularUtil.turretDelta(targetAngle));
         }
 
         @Override
@@ -240,13 +237,8 @@
 
 //            m_telemetry.addData("Done Searching", foundMotifTag ? "✔️" : "✖️");
 //            m_telemetry.addData("Target Angle:", targetAngle);
-//            m_telemetry.addData("Motor Angle:", ticksToDegrees(m_motor.getCurrentPosition()));
-//            m_telemetry.addData("Current Angle:", currentAngle);
-//            m_telemetry.addData("Initial Angle:", initialAngle);
-//            m_telemetry.addData("Target Ticks:", targetTicks);
+            m_telemetry.addData("Motor Angle:", ticksToDegrees(m_motor.getCurrentPosition()));
             m_telemetry.addData("Motor Ticks:", m_motor.getCurrentPosition());
-//            m_telemetry.addData("Wrapped Target Angle", AngularUtil.wrap360(targetAngle));
-//            m_telemetry.addData("Wrapped Motor Angle", AngularUtil.wrap360(ticksToDegrees(m_motor.getCurrentPosition())));
             m_telemetry.addData("X:", m_follower.getPose().getX());
             m_telemetry.addData("Y:", m_follower.getPose().getY());
             m_telemetry.addData("H:", AngularUtil.wrap360(Math.toDegrees(m_follower.getPose().getHeading())));

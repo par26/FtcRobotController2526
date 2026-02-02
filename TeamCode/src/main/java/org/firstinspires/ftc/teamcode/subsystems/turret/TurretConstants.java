@@ -28,7 +28,7 @@ public class TurretConstants {
     //tuned :checkmark:
     public static class ROTATE {
         public static double POWER = 0.60;
-        public static double kP = 0.02;
+        public static double kP = 0.01;
         public static double TOLERANCE = 15;
     }
 

@@ -11,15 +11,11 @@ public final class AngularUtil {
     /**
      * employed to prevent >360 movement
      * @param current
-     * @param offset
      * @param maxAngle
      * @return Degrees
      */
-    public static double limitedTurretDelta(double current, double offset, int maxAngle) {
-        double rawTarget = current + offset;
-
-        double wrapped = wrap360(rawTarget);
-
+    public static double limitedTurretDelta(double current, int maxAngle) {
+        double wrapped = wrap360(current);
         if (wrapped > maxAngle) {
             double deadzoneMid = (360.0 + maxAngle) / 2.0;
 
@@ -30,16 +26,15 @@ public final class AngularUtil {
             }
         }
 
-        return wrapped - current;
+        return wrapped;
     }
     /**
      * Overloading using default absoluteMax
      * @param current
-     * @param offset
      * @return Degrees
      */
-    public static double turretDelta(double current, double offset) {
-        return limitedTurretDelta(current, offset, 350);
+    public static double turretDelta(double current) {
+        return limitedTurretDelta(current, 330);
     }
 }
 

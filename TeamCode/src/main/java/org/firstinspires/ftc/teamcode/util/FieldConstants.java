@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.pedropathing.geometry.Pose;
 
 public class FieldConstants {
-    public static Pose redSpawnTest = new Pose(64, 82, Math.toRadians(90));
+    public static Pose redSpawnTest = new Pose(64, 80, Math.toRadians(90));
 
     public static Pose blueGoalPose = new Pose(8, 135, Math.toRadians(135));
     public static Pose redGoalPose = new Pose(135, 135, Math.toRadians(135));
