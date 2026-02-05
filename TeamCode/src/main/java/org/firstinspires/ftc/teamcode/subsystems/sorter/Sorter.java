@@ -17,14 +17,14 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 @Configurable
-public class SorterSubsystem extends SubsystemBase {
+public class Sorter extends SubsystemBase {
 
     public enum SorterState {
         INTAKE,
         SHOOT
     }
 
-    private final RTPSubsystem m_rtp;
+    private final RTP m_rtp;
     private final Servo m_kicker;
 
     private final RevColorSensorV3 sensor1;
@@ -36,7 +36,6 @@ public class SorterSubsystem extends SubsystemBase {
     public SorterNode sorterNode3;
 
     public SorterNode[] sorterNodes;
-
     public SorterNode.NodeOption[] motif;
 
     private final ElapsedTime kickerTimer = new ElapsedTime();
@@ -46,7 +45,9 @@ public class SorterSubsystem extends SubsystemBase {
     private double curKickerAngle;
     private int deviation;
 
-    public SorterSubsystem(HardwareMap hwMap, RTPSubsystem rtp, boolean isIntakeState) {
+    private boolean isIntakeState = true;
+
+    public Sorter(HardwareMap hwMap, RTP rtp) {
         m_rtp = rtp;
         m_kicker = hwMap.get(Servo.class, SorterConstants.HW.KICKER);
 
@@ -156,16 +157,6 @@ public class SorterSubsystem extends SubsystemBase {
         return SorterNode.NodeOption.EMPTY;
     }
 
-    /* Possible variants
-    * (GPP, 1G, 2P          G -> P -> P)
-    * (GPP, 2G, 1P,         G -> P -> ?)
-    * (GPP, 2P || 2G        G -> P -> X)
-    * (GPP, 1G, 1P)         G -> P -> X)
-    * (GPP, 3G || 3P,       ? -> ? -> ?)
-    * (PGP, [same input variants]
-    * (PPG, [same input variants]
-    * [...]
-     */
     //returns whole array, but only uses index 0 b/c we want to preserve order
     public SorterNode[] getNodeOrder() {
         Queue<SorterNode> greens = new ArrayDeque<>();

@@ -1,13 +1,13 @@
     package org.firstinspires.ftc.teamcode.subsystems.turret;
 
     import com.bylazar.configurables.annotations.Configurable;
-    import com.bylazar.configurables.annotations.IgnoreConfigurable;
     import com.pedropathing.follower.Follower;
     import com.pedropathing.geometry.Pose;
     import com.qualcomm.hardware.limelightvision.LLResult;
     import com.qualcomm.hardware.limelightvision.LLResultTypes;
     import com.qualcomm.hardware.limelightvision.Limelight3A;
     import com.qualcomm.robotcore.hardware.HardwareMap;
+    import com.qualcomm.robotcore.util.ElapsedTime;
     import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
     import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -21,7 +21,7 @@
     import java.util.Map;
 
     @Configurable
-    public class TurretSubsystem extends SubsystemBase {
+    public class Turret extends SubsystemBase {
 
         private final Limelight3A m_limelight;
         private final Motor m_motor;
@@ -62,16 +62,17 @@
         private boolean foundGoalTag = false;
 
         private List<LLResultTypes.FiducialResult> foundTags;
-        @IgnoreConfigurable
+        private LLResultTypes.FiducialResult targetTag;
 
         private double targetAngle;
-        private double currentAngle;
         private int targetTicks;
 
-        private double initialAngle;
+        private ElapsedTime timer = new ElapsedTime();
+        private double accumulatedOffsetAngle = 0;
+
         //TODO: boolean value for alliance side
 
-        public TurretSubsystem(HardwareMap hwMap, Telemetry telemetry, Follower follower) {
+        public Turret(HardwareMap hwMap, Telemetry telemetry, Follower follower) {
             m_limelight = hwMap.get(Limelight3A.class, TurretConstants.HW.LIMELIGHT);
             m_motor = new Motor(hwMap, TurretConstants.HW.MOTOR,28, 435);
             m_telemetry = telemetry;
@@ -92,38 +93,6 @@
             targetPose = FieldConstants.obeliskPose;
         }
 
-//        /**
-//         * Set desired turret angle [0-360] (avoids repeated spinning)
-//         * @param angle degrees [0-360]
-//         */
-//        public void setClosestAngle(double angle) {
-//            double currentAngle = ticksToDegrees(m_motor.getCurrentPosition());
-//            double wrappedCurrent = AngularUtil.wrap360(currentAngle);
-//        }
-//
-//        /**
-//         * Increment turret angle [0-360]
-//         * @param angle degrees [0-360]
-//         */
-//        public void incrementAngle(double angle) {
-//
-//        }
-//        private void search() {
-//            int increment = 20;
-//            if (m_motor.atTargetPosition()) {
-//                targetAngle += isLastRight ? increment : -increment;
-//            }
-//        }
-//        private void lock() {
-//            goal_tx = (int) goalTag.getTargetXDegrees();
-//            isLastRight = goal_tx > 0;
-//            m_telemetry.addData("TargetX Degrees", goal_tx);
-//
-//            if (m_motor.atTargetPosition()) {
-//                targetAngle += goal_tx;
-//            }
-//
-//        }
         //checking if found game motif & if goal wanted found
         private void scanTags() {
             foundGoalTag = false;
@@ -138,11 +107,13 @@
                 }
 
                 if (curID == BLUE_TAG && MatchConstants.isBlueAlliance) {
+                    targetTag = curTag;
                     foundGoalTag = true;
                     break;
                 }
 
                 if (curID == RED_TAG && !MatchConstants.isBlueAlliance) {
+                    targetTag = curTag;
                     foundGoalTag = true;
                 }
 
@@ -152,9 +123,7 @@
 
         /* angle updates */
         static double MOTOR_TICKS_PER_REV = 384.5;
-        public static double EXTERNAL_GEAR_RATIO = 4.8; // motor revs per turret rev
-
-        static double TICKS_PER_TURRET_REV = MOTOR_TICKS_PER_REV * EXTERNAL_GEAR_RATIO;
+        static double TICKS_PER_TURRET_REV = MOTOR_TICKS_PER_REV * TurretConstants.ROTATE.EXTERNAL_GEAR_RATIO;
 
         public static double ticksToDegrees(double ticks) {
             return ticks * (360.0 / TICKS_PER_TURRET_REV);
@@ -164,7 +133,7 @@
             return (int) Math.round(degrees * (TICKS_PER_TURRET_REV / 360.0));
         }
 
-        public double calculateTurretAngle(Pose currentPose, Pose goalPose) {
+        private double calculateTurretAngle(Pose currentPose, Pose goalPose) {
             Pose turretPoseRelativeToRobot = getAdjustedPose(currentPose, 12);
 
             m_telemetry.addData("turretPoseX", turretPoseRelativeToRobot.getX());
@@ -189,6 +158,26 @@
             return turretAngleToTarget;     
         }
 
+        /**
+         * Using limelight to offset turret angle (if motor drifts) and turret not currently rotate
+         */
+        private void calculateOffset() {
+            double tx = targetTag.getTargetXDegrees();
+            double curPos = m_motor.getCurrentPosition();
+            double delta = Math.abs(targetAngle - curPos);
+            m_telemetry.addData("tx", tx);
+            if (timer.seconds() > TurretConstants.ROTATE.OFFSET_INTERVAL && delta < 5) {
+                accumulatedOffsetAngle += TurretConstants.ROTATE.OFFSET_AMPLIFIER * -tx;
+                timer.reset();
+            }
+        }
+
+        /**
+         * accounting for the turret being offset from center
+         * @param currentPose
+         * @param offsetDistanceCm
+         * @return
+         */
         public static Pose getAdjustedPose(Pose currentPose, double offsetDistanceCm) {
             double headingRad = currentPose.getHeading();
             offsetDistanceCm /= 2.54;
@@ -201,9 +190,9 @@
         }
 
         public void updateTargetTicks() {
+            if (foundGoalTag) {calculateOffset();}
             targetAngle = calculateTurretAngle(m_follower.getPose(), targetPose);
-            currentAngle = ticksToDegrees(m_motor.getCurrentPosition());
-            targetTicks = degreesToTicks(AngularUtil.turretDelta(targetAngle));
+            targetTicks = degreesToTicks(AngularUtil.turretDelta(targetAngle + accumulatedOffsetAngle));
         }
 
         @Override
@@ -235,10 +224,10 @@
 
         private void log() {
 
-//            m_telemetry.addData("Done Searching", foundMotifTag ? "✔️" : "✖️");
-//            m_telemetry.addData("Target Angle:", targetAngle);
+            m_telemetry.addData("Done Searching", foundMotifTag ? "✔️" : "✖️");
             m_telemetry.addData("Motor Angle:", ticksToDegrees(m_motor.getCurrentPosition()));
             m_telemetry.addData("Motor Ticks:", m_motor.getCurrentPosition());
+            m_telemetry.addData("Accumulated:", accumulatedOffsetAngle);
             m_telemetry.addData("X:", m_follower.getPose().getX());
             m_telemetry.addData("Y:", m_follower.getPose().getY());
             m_telemetry.addData("H:", AngularUtil.wrap360(Math.toDegrees(m_follower.getPose().getHeading())));

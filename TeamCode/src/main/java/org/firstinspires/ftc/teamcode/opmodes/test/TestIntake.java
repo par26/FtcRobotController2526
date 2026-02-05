@@ -7,19 +7,19 @@ import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
 
 @TeleOp(group="test")
 public class TestIntake extends CommandOpMode {
 
     private GamepadEx m_driver;
-    private IntakeSubsystem m_intake;
+    private Intake m_intake;
 
     @Override
     public void initialize() {
         m_driver = new GamepadEx(gamepad1);
-        m_intake = new IntakeSubsystem(hardwareMap);
+        m_intake = new Intake(hardwareMap);
 
         register(m_intake);
 

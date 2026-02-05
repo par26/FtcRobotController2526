@@ -1,18 +1,18 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommand extends CommandBase {
 
-    private final DriveSubsystem drive;
+    private final Drive drive;
     private final DoubleSupplier forward, strafe, turn;
     private final BooleanSupplier robotCentric;
     private final DoubleSupplier multiplier;
 
-    public DriveCommand(DriveSubsystem drive, DoubleSupplier forward,
+    public DriveCommand(Drive drive, DoubleSupplier forward,
                         DoubleSupplier strafe, DoubleSupplier turn,
                         BooleanSupplier robotCentric, DoubleSupplier multiplier) {
         this.drive = drive;

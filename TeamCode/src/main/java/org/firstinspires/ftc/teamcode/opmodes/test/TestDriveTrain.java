@@ -3,22 +3,20 @@ package org.firstinspires.ftc.teamcode.opmodes.test;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.Localization;
 
 @TeleOp(group="test")
 public class TestDriveTrain extends CommandOpMode {
 
     private GamepadEx m_driver;
-    private DriveSubsystem m_drive;
-    private LocalizationSubsystem m_local;
+    private Drive m_drive;
+    private Localization m_local;
     private Follower m_follower;
 
     @Override
@@ -26,8 +24,8 @@ public class TestDriveTrain extends CommandOpMode {
         m_follower = Constants.createFollower(hardwareMap);
 
         m_driver = new GamepadEx(gamepad1);
-        m_drive = new DriveSubsystem(hardwareMap, m_follower);
-        m_local = new LocalizationSubsystem(telemetry, m_follower);
+        m_drive = new Drive(hardwareMap, m_follower);
+        m_local = new Localization(telemetry, m_follower);
 
         register(m_drive, m_local);
 

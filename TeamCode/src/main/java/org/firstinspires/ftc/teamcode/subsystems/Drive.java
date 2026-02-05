@@ -3,13 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.pedropathing.Constants;
-
-public class DriveSubsystem extends SubsystemBase {
+public class Drive extends SubsystemBase {
 
     private final Follower follower;
 
-    public DriveSubsystem(HardwareMap hwMap, Follower follower) {
+    public Drive(HardwareMap hwMap, Follower follower) {
         this.follower = follower;
     }
 

@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 @Configurable
-public class OuttakeV2Subsystem extends SubsystemBase{
+public class OuttakeV2 extends SubsystemBase{
     private Motor m_flywheelMotor;
 
     //tune values in prod
@@ -17,7 +15,7 @@ public class OuttakeV2Subsystem extends SubsystemBase{
 
     private double power;
 
-    public OuttakeV2Subsystem(HardwareMap hwMap) {
+    public OuttakeV2(HardwareMap hwMap) {
         m_flywheelMotor = new Motor(hwMap, "flyWheel",28, 6000);
         m_flywheelMotor.setRunMode(Motor.RunMode.VelocityControl);
         m_flywheelMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

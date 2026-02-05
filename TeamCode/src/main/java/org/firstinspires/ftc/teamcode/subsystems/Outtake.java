@@ -2,11 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 @Configurable
-public class OuttakeSubsystem extends SubsystemBase{
+public class Outtake extends SubsystemBase{
     private Motor m_flywheelMotor;
     public static double LAUNCH_POWER_CLOSE = 0.41;
     public static double LAUNCH_POWER_FAR = 0.50;
@@ -18,7 +17,7 @@ public class OuttakeSubsystem extends SubsystemBase{
 
     private double power;
 
-    public OuttakeSubsystem(HardwareMap hwMap) {
+    public Outtake(HardwareMap hwMap) {
         m_flywheelMotor = new Motor(hwMap, "flyWheel",28, 6000);
         m_flywheelMotor.setRunMode(Motor.RunMode.VelocityControl);
         m_flywheelMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

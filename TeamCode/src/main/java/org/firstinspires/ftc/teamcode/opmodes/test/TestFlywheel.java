@@ -6,18 +6,18 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.Outtake;
 
 @TeleOp(group="test")
 public class TestFlywheel extends CommandOpMode {
 
-    private OuttakeSubsystem m_outtake;
+    private Outtake m_outtake;
     private GamepadEx m_driver;
 
     @Override
     public void initialize() {
         m_driver = new GamepadEx(gamepad1);
-        m_outtake = new OuttakeSubsystem(hardwareMap);
+        m_outtake = new Outtake(hardwareMap);
 
         register(m_outtake);
 

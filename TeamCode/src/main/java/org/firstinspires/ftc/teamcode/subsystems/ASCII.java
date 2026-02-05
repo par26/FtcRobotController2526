@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 //driverhub art lol
-public class ASCIISubsystem extends SubsystemBase{
+public class ASCII extends SubsystemBase{
 
     private Telemetry m_telemetry;
 
-    public ASCIISubsystem(Telemetry telemetry) {
+    public ASCII(Telemetry telemetry) {
         this.m_telemetry = telemetry;
     }
 

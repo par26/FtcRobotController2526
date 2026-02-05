@@ -9,16 +9,16 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.sorter.SorterIntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.sorter.SorterShootCommand;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTP;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.Sorter;
 
 public class TeleOp extends CommandOpMode {
 
     //Subsystems
     private GamepadEx gp1;
 
-    private SorterSubsystem m_sorter;
-    private RTPSubsystem m_rtp;
+    private Sorter m_sorter;
+    private RTP m_rtp;
 
 
     @Override
@@ -30,8 +30,8 @@ public class TeleOp extends CommandOpMode {
 
         gp1 = new GamepadEx(gamepad1);
 
-        m_rtp = new RTPSubsystem(hardwareMap);
-        m_sorter = new SorterSubsystem(hardwareMap, m_rtp, true);
+        m_rtp = new RTP(hardwareMap);
+        m_sorter = new Sorter(hardwareMap, m_rtp);
 
         //Sorter
         gp1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)

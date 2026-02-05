@@ -3,23 +3,21 @@ package org.firstinspires.ftc.teamcode.opmodes.test;
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Localization;
-import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.old.ManualTurretSubsystem;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
 import org.firstinspires.ftc.teamcode.util.MatchConstants;
 
 @TeleOp(group="test")
-public class TestTurret extends CommandOpMode {
+public class TestManualTurret extends CommandOpMode {
 
-    private Turret m_turret;
+    private ManualTurretSubsystem m_turret;
     private GamepadEx m_driver1;
-    private Drive m_drive;
     private Follower m_follower;
     private Localization m_local;
 
@@ -29,26 +27,29 @@ public class TestTurret extends CommandOpMode {
         MatchConstants.goalPose = FieldConstants.redGoalPose;
         MatchConstants.startPose = FieldConstants.redSpawnTest;
         MatchConstants.isBlueAlliance = false;
+
         m_follower = Constants.createFollower(hardwareMap);
         m_follower.setStartingPose(FieldConstants.redSpawnTest);
 
         m_driver1 = new GamepadEx(gamepad1);
-        m_turret = new Turret(hardwareMap, telemetry, m_follower);
-        m_drive = new Drive(hardwareMap, m_follower);
+        m_turret = new ManualTurretSubsystem(hardwareMap, telemetry, m_follower);
         m_local = new Localization(telemetry, m_follower);
 
-        register(m_local, m_turret, m_drive);
+        register(m_local, m_turret);
 
-        m_drive.setDefaultCommand(
-                new DriveCommand(
-                        m_drive,
-                        () -> m_driver1.getLeftY(),
-                        () -> -m_driver1.getLeftX(),
-                        () -> -m_driver1.getRightX(),
-                        () -> true,
-                        () -> m_driver1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).get() ? 0.35 : 1.0
-                )
-        );
+        m_driver1.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new InstantCommand(() -> m_turret.rotateTo180()));
+
+        m_driver1.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(new InstantCommand(() -> m_turret.rotateTo0()));
+
+        m_driver1.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(new InstantCommand(() -> m_turret.increment30()));
+
+        m_driver1.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+                .whenPressed(new InstantCommand(() -> m_turret.decrement30()));
+
+
 
     }
 }

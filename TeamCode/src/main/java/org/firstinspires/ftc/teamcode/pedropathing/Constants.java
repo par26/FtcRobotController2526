@@ -53,7 +53,7 @@ public class Constants {
 //            .forwardPodY(-3.35)
             .forwardPodY(-3.4)
 //            .strafePodX(-4.53)
-            .strafePodX(-4.55)
+            .strafePodX(- 4.55)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)

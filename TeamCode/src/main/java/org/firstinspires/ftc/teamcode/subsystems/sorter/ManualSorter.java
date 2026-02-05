@@ -7,15 +7,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 
 @Configurable
-public class ManualSorterSubsystem extends SubsystemBase {
+public class ManualSorter extends SubsystemBase {
 
-    private RTPSubsystem m_rtp;
+    private RTP m_rtp;
     private Servo m_servo;
 
     private int deviation = 0;
     private double curKickerAngle;
 
-    public ManualSorterSubsystem(HardwareMap hwMap, RTPSubsystem rtp) {
+    public ManualSorter(HardwareMap hwMap, RTP rtp) {
         m_rtp = rtp;
         m_servo = hwMap.get(Servo.class, "kicker");
 

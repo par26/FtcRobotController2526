@@ -10,7 +10,6 @@ public class TurretConstants {
     public static Turret turret = new Turret();
     public static class Turret {
         public ROTATE rotate = new ROTATE();
-        public SEARCH search = new SEARCH();
         public VISION vision = new VISION();
     }
 
@@ -29,10 +28,10 @@ public class TurretConstants {
     public static class ROTATE {
         public static double POWER = 0.60;
         public static double kP = 0.01;
-        public static double TOLERANCE = 15;
-    }
+        public static double TOLERANCE = 10;
 
-    public static class SEARCH {
-        public static double SEARCH_SPEED = 0.3;
+        public static double OFFSET_AMPLIFIER = 0.5;
+        public static double OFFSET_INTERVAL = 0.5;
+        public static double EXTERNAL_GEAR_RATIO = 4.37499955; // motor revs per turret rev
     }
 }

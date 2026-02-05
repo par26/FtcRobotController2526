@@ -6,19 +6,17 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.LiftSubsystem;
-
-import kotlin.time.Instant;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
 
 @TeleOp(group="test")
 public class TestLift extends CommandOpMode {
 
-    private LiftSubsystem m_lift;
+    private Lift m_lift;
     private GamepadEx m_driver;
 
     @Override
     public void initialize() {
-        m_lift = new LiftSubsystem(hardwareMap);
+        m_lift = new Lift(hardwareMap);
         m_driver = new GamepadEx(gamepad1);
 
         register(m_lift);

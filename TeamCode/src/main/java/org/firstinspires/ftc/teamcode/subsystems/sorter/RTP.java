@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 
 @Configurable
-public class RTPSubsystem extends SubsystemBase {
+public class RTP extends SubsystemBase {
 
     private CRServoEx m_servo;
     private AbsoluteAnalogEncoder m_encoder;
@@ -23,7 +23,7 @@ public class RTPSubsystem extends SubsystemBase {
     public static double kI = 0.0;
     public static double kD = 0.0015;
 
-    public RTPSubsystem(HardwareMap hwMap) {
+    public RTP(HardwareMap hwMap) {
         m_encoder = new AbsoluteAnalogEncoder(hwMap, SorterConstants.HW.ENCODER);
         m_servo = new CRServoEx(hwMap, SorterConstants.HW.SERVO, m_encoder, CRServoEx.RunMode.OptimizedPositionalControl);
 

@@ -2,11 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Configurable
-public class IntakeSubsystem extends SubsystemBase {
+public class Intake extends SubsystemBase {
 
     private CRServo m_servo;
     private boolean isIntaking = true;
@@ -18,7 +17,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final CRServo.Direction intakeDirection = CRServo.Direction.REVERSE;
     private final CRServo.Direction reverseDirection = CRServo.Direction.FORWARD;
 
-    public IntakeSubsystem(HardwareMap hwMap) {
+    public Intake(HardwareMap hwMap) {
         m_servo = hwMap.get(CRServo.class, "intakeServo");
         m_servo.setDirection(intakeDirection);
 

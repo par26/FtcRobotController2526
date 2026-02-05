@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.commands.CommandBase;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterConstants;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.Sorter;
 import org.firstinspires.ftc.teamcode.util.SorterNode;
 
 
 /** state handler for shooting */
 public class SorterShootCommand extends CommandBase {
 
-    private final SorterSubsystem m_sorter;
+    private final Sorter m_sorter;
 
     private enum State {
         TRANSFER,
@@ -20,7 +20,7 @@ public class SorterShootCommand extends CommandBase {
         HOLD2
     }
 
-    public SorterShootCommand(SorterSubsystem sorter) {
+    public SorterShootCommand(Sorter sorter) {
         this.m_sorter = sorter;
     }
 

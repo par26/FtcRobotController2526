@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.commands.sorter;
 
 
 import org.firstinspires.ftc.teamcode.commands.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.Sorter;
 
 public class SorterIntakeCommand extends CommandBase {
 
-    private final SorterSubsystem m_sorter;
+    private final Sorter m_sorter;
 
     private enum State {
         INTAKING,
@@ -15,7 +15,7 @@ public class SorterIntakeCommand extends CommandBase {
 
     private State state;
 
-    public SorterIntakeCommand(SorterSubsystem sorter) {
+    public SorterIntakeCommand(Sorter sorter) {
         this.m_sorter = sorter;
         addRequirements(sorter);
     }

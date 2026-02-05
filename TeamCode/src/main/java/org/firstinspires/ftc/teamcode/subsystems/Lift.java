@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 @Configurable
-public class LiftSubsystem extends SubsystemBase {
+public class Lift extends SubsystemBase {
 
     private MotorGroup m_lift;
     private Motor m_left;
@@ -20,7 +20,7 @@ public class LiftSubsystem extends SubsystemBase {
 
     public static int TOLERANCE = 15;
 
-    public LiftSubsystem(HardwareMap hwMap) {
+    public Lift(HardwareMap hwMap) {
         m_left = new Motor(hwMap, "leftLiftMotor");
         m_right = new Motor(hwMap, "rightLiftMotor");
 

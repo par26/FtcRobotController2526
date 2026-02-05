@@ -6,12 +6,12 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.sorter.RTPSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.RTP;
 
 @TeleOp(name = "Cont. Rotation Axon Test", group = "test")
 public class TestRTPAxon extends CommandOpMode {
 
-    private RTPSubsystem axon;
+    private RTP axon;
     private GamepadEx m_driver;
 
     @Override
@@ -20,7 +20,7 @@ public class TestRTPAxon extends CommandOpMode {
 
 
         m_driver = new GamepadEx(gamepad1);
-        axon = new RTPSubsystem(hardwareMap);
+        axon = new RTP(hardwareMap);
 
         register(axon);
 

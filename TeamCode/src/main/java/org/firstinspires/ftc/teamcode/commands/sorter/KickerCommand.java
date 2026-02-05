@@ -4,13 +4,13 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorter;
 
 public class KickerCommand extends SequentialCommandGroup {
 
-    private final ManualSorterSubsystem m_sorter;
+    private final ManualSorter m_sorter;
 
-    public KickerCommand(ManualSorterSubsystem sorter) {
+    public KickerCommand(ManualSorter sorter) {
         m_sorter = sorter;
 
         addCommands(
