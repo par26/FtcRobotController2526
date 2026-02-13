@@ -1,31 +1,53 @@
 package org.firstinspires.ftc.teamcode.opmodes.test;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 
-import org.firstinspires.ftc.teamcode.commands.sorter.KickerCommand;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.ManualSorter;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.RTP;
+import org.firstinspires.ftc.teamcode.commands.IntakeStateCommand;
+import org.firstinspires.ftc.teamcode.commands.ShootStateCommand;
+import org.firstinspires.ftc.teamcode.commands.sorter.SorterIntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.sorter.SorterShootCommand;
+import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.Kicker;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSensor;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterServo;
+import org.firstinspires.ftc.teamcode.util.MatchValues;
+import org.firstinspires.ftc.teamcode.util.SorterNode;
 
-@TeleOp(group="test")
+@TeleOp(group = "test")
 public class TestSorter extends CommandOpMode {
 
-    private GamepadEx m_driver;
-    private ManualSorter m_sorter;
-    private RTP m_rtp;
+    private Intake m_intake;
+    private SorterServo m_servo;
+    private Kicker m_kicker;
+    private SorterSensor m_sensor;
+
 
     @Override
     public void initialize() {
-        m_driver = new GamepadEx(gamepad1);
-        m_rtp = new RTP(hardwareMap);
-        m_sorter = new ManualSorter(hardwareMap, m_rtp);
+        MatchValues.robotState = MatchValues.RobotState.INTAKE;
+        MatchValues.matchMotif = new SorterNode.NodeOption[] {SorterNode.NodeOption.PURPLE, SorterNode.NodeOption.GREEN, SorterNode.NodeOption.PURPLE};
 
-        register(m_sorter, m_rtp);
+        m_intake = new Intake(hardwareMap);
+        m_sensor = new SorterSensor(hardwareMap);
+        m_kicker = new Kicker(hardwareMap);
+        m_servo = new SorterServo(hardwareMap);
 
-        //heres the kicker
-        m_driver.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(new KickerCommand(m_sorter));
+        register(m_intake, m_sensor, m_kicker, m_servo);
+
+        new Trigger(() -> MatchValues.robotState == MatchValues.RobotState.SHOOT)
+                .whenActive(new SequentialCommandGroup(
+                        new IntakeStateCommand(m_intake, m_servo),
+                        new SorterShootCommand(m_sensor, m_servo, m_kicker)
+                ));
+
+        new Trigger(() -> MatchValues.robotState == MatchValues.RobotState.INTAKE)
+                .whenActive(new SequentialCommandGroup(
+                        new ShootStateCommand(m_intake, m_servo),
+                        new SorterIntakeCommand(m_sensor, m_servo)
+                ));
     }
 }

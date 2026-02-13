@@ -6,7 +6,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 @Configurable
 public class Outtake extends SubsystemBase{
-    private Motor m_flywheelMotor;
+    private Motor m_motor;
     public static double LAUNCH_POWER_CLOSE = 0.41;
     public static double LAUNCH_POWER_FAR = 0.50;
 
@@ -18,22 +18,22 @@ public class Outtake extends SubsystemBase{
     private double power;
 
     public Outtake(HardwareMap hwMap) {
-        m_flywheelMotor = new Motor(hwMap, "flyWheel",28, 6000);
-        m_flywheelMotor.setRunMode(Motor.RunMode.VelocityControl);
-        m_flywheelMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        m_flywheelMotor.setVeloCoefficients(p, i, d);
+        m_motor = new Motor(hwMap, "flyWheel",28, 6000);
+        m_motor.setRunMode(Motor.RunMode.VelocityControl);
+        m_motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        m_motor.setVeloCoefficients(p, i, d);
 
         power = LAUNCH_POWER_CLOSE;
-        m_flywheelMotor.resetEncoder();
+        m_motor.resetEncoder();
     }
 
     public void spin(boolean isThree) {
-        m_flywheelMotor.setRunMode(Motor.RunMode.VelocityControl);
+        m_motor.setRunMode(Motor.RunMode.VelocityControl);
         power = isThree ? LAUNCH_POWER_FAR : LAUNCH_POWER_CLOSE;
     }
 
     @Override
     public void periodic() {
-        m_flywheelMotor.set(power);
+        m_motor.set(power);
     }
 }

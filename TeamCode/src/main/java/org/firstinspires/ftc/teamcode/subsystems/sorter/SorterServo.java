@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 
 @Configurable
-public class RTP extends SubsystemBase {
+public class SorterServo extends SubsystemBase {
 
     private CRServoEx m_servo;
     private AbsoluteAnalogEncoder m_encoder;
@@ -23,7 +23,7 @@ public class RTP extends SubsystemBase {
     public static double kI = 0.0;
     public static double kD = 0.0015;
 
-    public RTP(HardwareMap hwMap) {
+    public SorterServo(HardwareMap hwMap) {
         m_encoder = new AbsoluteAnalogEncoder(hwMap, SorterConstants.HW.ENCODER);
         m_servo = new CRServoEx(hwMap, SorterConstants.HW.SERVO, m_encoder, CRServoEx.RunMode.OptimizedPositionalControl);
 
@@ -31,8 +31,21 @@ public class RTP extends SubsystemBase {
         m_servo.set(Math.toRadians(0));
     }
 
-    public void changeAngle(double angle) {
+    private void changeAngle(double angle) {
         targetPos += angle;
+    }
+
+    public void rotateC() {
+        changeAngle(SorterConstants.Index.NODE_ANGLE_DEG);
+    }
+    public void rotateCC() {
+        changeAngle(-SorterConstants.Index.NODE_ANGLE_DEG);
+    }
+    public void applyOffset() {
+        changeAngle(SorterConstants.Index.OFFSET_ANGLE_DEG);
+    }
+    public void removeOffset() {
+        changeAngle(-SorterConstants.Index.OFFSET_ANGLE_DEG);
     }
 
     public void setAngle(double angle) {

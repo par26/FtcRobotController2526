@@ -1,25 +1,25 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.sorter;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterConstants;
+import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 
- public class TempKicker extends SubsystemBase {
+public class Kicker extends SubsystemBase {
     private Servo m_kicker;
 
     double curKickerAngle;
 
-    public TempKicker(HardwareMap hwMap) {
+    public Kicker(HardwareMap hwMap) {
         m_kicker = hwMap.get(Servo.class, "kicker");
         curKickerAngle = SorterConstants.Kicker.RESET_POS;
 
     }
 
-    public void kickerActivate() {
+    public void activate() {
         curKickerAngle = SorterConstants.Kicker.ACTIVATE_POS;
     }
-    public void kickerReset() {
+    public void rest() {
         curKickerAngle = SorterConstants.Kicker.RESET_POS;
     }
 

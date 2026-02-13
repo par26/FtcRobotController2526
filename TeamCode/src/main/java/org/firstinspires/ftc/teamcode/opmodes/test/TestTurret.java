@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drive;
 import org.firstinspires.ftc.teamcode.subsystems.Localization;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
-import org.firstinspires.ftc.teamcode.util.MatchConstants;
+import org.firstinspires.ftc.teamcode.util.MatchValues;
 
 @TeleOp(group="test")
 public class TestTurret extends CommandOpMode {
@@ -26,9 +26,9 @@ public class TestTurret extends CommandOpMode {
     @Override
     public void initialize() {
 
-        MatchConstants.goalPose = FieldConstants.redGoalPose;
-        MatchConstants.startPose = FieldConstants.redSpawnTest;
-        MatchConstants.isBlueAlliance = false;
+        MatchValues.goalPose = FieldConstants.redGoalPose;
+        MatchValues.startPose = FieldConstants.redSpawnTest;
+        MatchValues.isBlueAlliance = false;
         m_follower = Constants.createFollower(hardwareMap);
         m_follower.setStartingPose(FieldConstants.redSpawnTest);
 

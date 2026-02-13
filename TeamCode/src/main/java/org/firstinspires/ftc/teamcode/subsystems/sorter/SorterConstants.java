@@ -19,7 +19,9 @@ public class SorterConstants {
         public static final String ENCODER = "sorterEncoder";
         public static final String SERVO = "sorterServo";
         public static final String KICKER  = "kicker";
-        public static final String NODE1   = "node1";
+        public static final String SENSOR1 = "sensor1";
+        public static final String SENSOR2 = "sensor2";
+
         public static final String NODE2   = "node2";
         public static final String NODE3   = "node3";
 
@@ -46,7 +48,6 @@ public class SorterConstants {
         public static double ACTIVATE_POS = 0.85;
         public static double RESET_POS    = 0.00;
 
-        // Use seconds if your code uses ElapsedTime.seconds()
         public static long HOLD_TIME_MS  = 2500;
     }
 }

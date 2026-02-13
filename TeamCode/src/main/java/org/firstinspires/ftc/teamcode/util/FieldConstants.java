@@ -9,4 +9,7 @@ public class FieldConstants {
     public static Pose redGoalPose = new Pose(135, 135, Math.toRadians(135));
     public static Pose obeliskPose = new Pose(72, 144, 0);
 
+    public static Pose blueAllianceRelocalizePose = new Pose();
+    public static Pose redAllianceRelocalizePose = new Pose();
+
 }

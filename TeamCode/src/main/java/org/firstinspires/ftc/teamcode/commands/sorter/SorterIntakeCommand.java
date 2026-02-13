@@ -1,54 +1,65 @@
 package org.firstinspires.ftc.teamcode.commands.sorter;
 
-
 import org.firstinspires.ftc.teamcode.commands.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.sorter.Sorter;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterServo;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterConstants;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSensor;
+import org.firstinspires.ftc.teamcode.util.MatchValues;
+import org.firstinspires.ftc.teamcode.util.SorterNode;
+
+import java.util.ArrayDeque;
+import java.util.List;
 
 public class SorterIntakeCommand extends CommandBase {
+    private final SorterSensor m_sensor;
+    private final SorterServo m_servo;
 
-    private final Sorter m_sorter;
+    private int intakeCount;
+    private MatchValues.RobotState nextState;
 
-    private enum State {
-        INTAKING,
-        ALTERNATING
-    }
+    SorterNode[] nodeArray;
 
-    private State state;
-
-    public SorterIntakeCommand(Sorter sorter) {
-        this.m_sorter = sorter;
-        addRequirements(sorter);
+    public SorterIntakeCommand(SorterSensor sensor, SorterServo servo) {
+        this.m_sensor = sensor;
+        this.m_servo = servo;
+        addRequirements(sensor, servo);
     }
 
     @Override
     public void initialize() {
-        state = State.INTAKING;
+        intakeCount = 2;
+        nodeArray = new SorterNode[] {m_sensor.sorterNode1, m_sensor.sorterNode2, m_sensor.sorterNode3};
+        nextState = MatchValues.RobotState.INTAKE;
+        MatchValues.robotState = MatchValues.RobotState.INTAKE;
     }
 
     @Override
     public void execute() {
-        switch (state) {
-            case INTAKING:
-                if (m_sorter.isOccupied(m_sorter.sorterNode1)) {
-                    m_sorter.rotateCC();
-                    state = State.ALTERNATING;
-                }
-                break;
-            case ALTERNATING:
-                if (m_sorter.isAtTarget()) {
-                    state = State.INTAKING;
-                }
-                break;
+        SorterNode.NodeOption chosen =
+                m_sensor.filtered1 != SorterNode.NodeOption.EMPTY ? m_sensor.filtered1 :
+                m_sensor.filtered2 != SorterNode.NodeOption.EMPTY ? m_sensor.filtered2 :
+                SorterNode.NodeOption.EMPTY;
+
+        if (m_servo.isAtTarget() && chosen != SorterNode.NodeOption.EMPTY) {
+            m_servo.rotateCC();
+            nodeArray[intakeCount].setNode(chosen);
+            intakeCount--;
+
+            if (intakeCount < 0) {
+                nextState = MatchValues.RobotState.SHOOT;
+            }
         }
     }
 
     @Override
-    public void end(boolean interrupted) {
-
+    public boolean isFinished() {
+        return nextState == MatchValues.RobotState.SHOOT;
     }
 
     @Override
-    public boolean isFinished() {
-        return m_sorter.isOccupied(m_sorter.sorterNode1) && m_sorter.isOccupied(m_sorter.sorterNode3);
+    public void end(boolean interrupted) {
+        MatchValues.robotState = MatchValues.RobotState.SHOOT;
+
+        m_sensor.initIndexMap();
     }
 }

@@ -28,11 +28,14 @@ public class Intake extends SubsystemBase {
     }
 
     public void raiseIntake() {
+        motorSpeed = 0;
         servoPosition = IntakeConstants.RAISE.RAISED_ANGLE;
     }
 
     public void lowerIntake() {
         servoPosition = IntakeConstants.RAISE.LOWERED_ANGLE;
+        motorSpeed = IntakeConstants.SPIN.INTAKE_POWER;
+        m_motor.setInverted(false);
     }
 
     public void intake() {

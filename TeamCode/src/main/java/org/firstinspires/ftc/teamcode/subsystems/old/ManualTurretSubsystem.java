@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretConstants;
 import org.firstinspires.ftc.teamcode.util.AngularUtil;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
-import org.firstinspires.ftc.teamcode.util.MatchConstants;
+import org.firstinspires.ftc.teamcode.util.MatchValues;
 import org.firstinspires.ftc.teamcode.util.SorterNode;
 
 import java.util.List;
@@ -135,17 +135,17 @@ public class ManualTurretSubsystem extends SubsystemBase {
 
             //motif mapping
             if (MOTIF_MAP.containsKey(curID) && !foundMotifTag) {
-                MatchConstants.matchMotif = MOTIF_MAP.get(curID);
+                MatchValues.matchMotif = MOTIF_MAP.get(curID);
                 foundMotifTag = true;
                 continue;
             }
 
-            if (curID == BLUE_TAG && MatchConstants.isBlueAlliance) {
+            if (curID == BLUE_TAG && MatchValues.isBlueAlliance) {
                 foundGoalTag = true;
                 break;
             }
 
-            if (curID == RED_TAG && !MatchConstants.isBlueAlliance) {
+            if (curID == RED_TAG && !MatchValues.isBlueAlliance) {
                 foundGoalTag = true;
             }
 
@@ -242,7 +242,7 @@ public class ManualTurretSubsystem extends SubsystemBase {
 
                 break;
             case LOCKED:
-                targetPose = MatchConstants.isBlueAlliance ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
+                targetPose = MatchValues.isBlueAlliance ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
                 m_telemetry.addLine("Turret: Locked");
                 break;
         }

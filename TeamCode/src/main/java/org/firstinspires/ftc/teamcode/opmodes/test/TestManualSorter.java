@@ -6,32 +6,29 @@ import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.teamcode.subsystems.sorter.RTP;
+import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterServo;
 
-@TeleOp(name = "Cont. Rotation Axon Test", group = "test")
-public class TestRTPAxon extends CommandOpMode {
+@TeleOp(group="test")
+public class TestManualSorter extends CommandOpMode {
 
-    private RTP axon;
     private GamepadEx m_driver;
+    private SorterServo m_servo;
 
     @Override
     public void initialize() {
-
-
-
         m_driver = new GamepadEx(gamepad1);
-        axon = new RTP(hardwareMap);
+        m_servo = new SorterServo(hardwareMap);
 
-        register(axon);
+        register(m_servo);
+
 
         m_driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(() -> axon.changeAngle(Math.toRadians(30))));
+                .whenPressed(new InstantCommand(() -> m_servo.rotateC(), m_servo));
 
         m_driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> axon.changeAngle(Math.toRadians(-30))));
+                .whenPressed(new InstantCommand(() -> m_servo.rotateCC(), m_servo));
 
         m_driver.getGamepadButton(GamepadKeys.Button.A)
-                .whenPressed(new InstantCommand(() -> axon.setAngle(0)));
+                .whenPressed(new InstantCommand(() -> m_servo.setAngle(0), m_servo));
     }
-
 }

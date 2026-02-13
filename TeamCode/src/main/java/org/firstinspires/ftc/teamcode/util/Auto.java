@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.util;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
-import static org.firstinspires.ftc.teamcode.util.FieldConstants.*;
-
 
 public class Auto {
 
@@ -20,7 +18,7 @@ public class Auto {
     }
 
     private void createPoses() {
-        switch (MatchConstants.startLocation) {
+        switch (MatchValues.startLocation) {
             case FAR:
 
                 break;
