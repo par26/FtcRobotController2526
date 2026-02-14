@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Localization;
 import org.firstinspires.ftc.teamcode.subsystems.old.ManualTurretSubsystem;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
 import org.firstinspires.ftc.teamcode.util.MatchValues;
 
@@ -26,7 +27,7 @@ public class TestManualTurret extends CommandOpMode {
 
         MatchValues.goalPose = FieldConstants.redGoalPose;
         MatchValues.startPose = FieldConstants.redSpawnTest;
-        MatchValues.isBlueAlliance = false;
+        MatchValues.alliance = Alliance.RED;
 
         m_follower = Constants.createFollower(hardwareMap);
         m_follower.setStartingPose(FieldConstants.redSpawnTest);

@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
 import org.firstinspires.ftc.teamcode.util.MatchValues;
 
@@ -27,7 +28,7 @@ public class ManualShooter extends SubsystemBase {
         m_flywheelMotor.setFeedforwardCoefficients(ShooterConstants.kS, ShooterConstants.kV);
 
         m_flywheelMotor.resetEncoder();
-        goalPose = MatchValues.isBlueAlliance ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
+        goalPose = MatchValues.alliance == Alliance.BLUE ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
     }
 
     private void log() {

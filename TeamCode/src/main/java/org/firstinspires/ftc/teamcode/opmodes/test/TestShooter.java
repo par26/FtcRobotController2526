@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.MatchValues;
 
 public class TestShooter extends CommandOpMode {
@@ -13,7 +14,7 @@ public class TestShooter extends CommandOpMode {
 
     @Override
     public void initialize() {
-        MatchValues.isBlueAlliance = false;
+        MatchValues.alliance = Alliance.RED;
         m_shooter = new Shooter(hardwareMap, m_follower);
 
         register(m_shooter);

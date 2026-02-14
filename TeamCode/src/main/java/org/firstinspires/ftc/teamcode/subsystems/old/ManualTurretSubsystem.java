@@ -15,6 +15,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.SubsystemBase;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretConstants;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.AngularUtil;
 import org.firstinspires.ftc.teamcode.util.FieldConstants;
 import org.firstinspires.ftc.teamcode.util.MatchValues;
@@ -140,12 +141,12 @@ public class ManualTurretSubsystem extends SubsystemBase {
                 continue;
             }
 
-            if (curID == BLUE_TAG && MatchValues.isBlueAlliance) {
+            if (curID == BLUE_TAG && MatchValues.alliance == Alliance.BLUE) {
                 foundGoalTag = true;
                 break;
             }
 
-            if (curID == RED_TAG && !MatchValues.isBlueAlliance) {
+            if (curID == RED_TAG && MatchValues.alliance == Alliance.RED) {
                 foundGoalTag = true;
             }
 
@@ -242,7 +243,7 @@ public class ManualTurretSubsystem extends SubsystemBase {
 
                 break;
             case LOCKED:
-                targetPose = MatchValues.isBlueAlliance ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
+                targetPose = MatchValues.alliance == Alliance.BLUE ? FieldConstants.blueGoalPose : FieldConstants.redGoalPose;
                 m_telemetry.addLine("Turret: Locked");
                 break;
         }

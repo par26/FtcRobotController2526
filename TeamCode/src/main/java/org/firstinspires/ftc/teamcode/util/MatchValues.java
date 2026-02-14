@@ -17,7 +17,7 @@ public class MatchValues {
 
     public static MatchValues.RobotStart startLocation;
     public static MatchValues.RobotState robotState;
-    public static boolean isBlueAlliance;
+    public static Alliance alliance;
     public static Follower matchFollower;
     public static Pose goalPose;
     public static Pose startPose;

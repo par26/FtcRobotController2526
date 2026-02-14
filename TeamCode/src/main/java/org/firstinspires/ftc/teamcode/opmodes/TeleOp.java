@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.commands.sorter.SorterShootCommand;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterServo;
 //import org.firstinspires.ftc.teamcode.subsystems.sorter.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSensor;
+import org.firstinspires.ftc.teamcode.util.Alliance;
 import org.firstinspires.ftc.teamcode.util.MatchValues;
 
 public class TeleOp extends CommandOpMode {
@@ -25,8 +26,9 @@ public class TeleOp extends CommandOpMode {
     private SorterSensor m_sorter;
     private SorterServo m_servo;
 
+    public TeleOp(Alliance alliance) {
 
-
+    }
 
 
     @Override
