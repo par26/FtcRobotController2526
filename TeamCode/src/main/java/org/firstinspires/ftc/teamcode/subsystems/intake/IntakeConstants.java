@@ -11,7 +11,8 @@ public class IntakeConstants {
 
     public static Intake intake = new Intake();
     public static class Intake {
-
+        public RAISE raise = new RAISE();
+        public SPIN spin = new SPIN();
     }
 
     public static class HW {

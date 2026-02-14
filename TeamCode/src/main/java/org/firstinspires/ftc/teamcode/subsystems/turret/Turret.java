@@ -136,24 +136,16 @@
         private double calculateTurretAngle(Pose currentPose, Pose goalPose) {
             Pose turretPoseRelativeToRobot = getAdjustedPose(currentPose, 12);
 
-            m_telemetry.addData("turretPoseX", turretPoseRelativeToRobot.getX());
-            m_telemetry.addData("turretPoseY", turretPoseRelativeToRobot.getY());
             double deltaX = goalPose.getX() - turretPoseRelativeToRobot.getX();
             double deltaY = goalPose.getY() - turretPoseRelativeToRobot.getY();
 
             //translational angle adjustment
             double absoluteAngleToTarget = Math.toDegrees(Math.atan2(deltaY, deltaX));
-            m_telemetry.addData("Translational Angle To Target", absoluteAngleToTarget);
-            m_telemetry.addData("Dx", deltaX);
-            m_telemetry.addData("Dy", deltaY);
             double robotHeading = AngularUtil.wrap360(Math.toDegrees(currentPose.getHeading()));
 
             // turret angle = (target angle) - (robot heading - 90°)
-            m_telemetry.addData("Robot Heading", robotHeading);
             double turretAngleToTarget = absoluteAngleToTarget - (robotHeading - 90.0);
-
             turretAngleToTarget = AngularUtil.wrap360(turretAngleToTarget);
-            m_telemetry.addData("Relative Angle to Target", turretAngleToTarget);
 
             return turretAngleToTarget;     
         }

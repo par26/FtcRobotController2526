@@ -9,7 +9,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.Outtake;
+import org.firstinspires.ftc.teamcode.subsystems.old.Outtake;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterSensor;
 import org.firstinspires.ftc.teamcode.subsystems.sorter.SorterServo;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;

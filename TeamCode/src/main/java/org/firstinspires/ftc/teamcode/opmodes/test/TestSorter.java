@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.button.Trigger;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.IntakeStateCommand;
 import org.firstinspires.ftc.teamcode.commands.ShootStateCommand;
@@ -25,6 +27,8 @@ public class TestSorter extends CommandOpMode {
     private Kicker m_kicker;
     private SorterSensor m_sensor;
 
+    private GamepadEx gp1;
+
 
     @Override
     public void initialize() {
@@ -35,18 +39,23 @@ public class TestSorter extends CommandOpMode {
         m_sensor = new SorterSensor(hardwareMap);
         m_kicker = new Kicker(hardwareMap);
         m_servo = new SorterServo(hardwareMap);
+        gp1 = new GamepadEx(gamepad1);
 
         register(m_intake, m_sensor, m_kicker, m_servo);
 
         new Trigger(() -> MatchValues.robotState == MatchValues.RobotState.SHOOT)
-                .whenActive(new SequentialCommandGroup(
-                        new IntakeStateCommand(m_intake, m_servo),
+                .whenActive(
+                        new ShootStateCommand(m_intake, m_servo)
+                );
+
+        new Trigger(() -> MatchValues.robotState == MatchValues.RobotState.SHOOT && gp1.isDown(GamepadKeys.Button.RIGHT_BUMPER))
+                .whileActiveOnce(
                         new SorterShootCommand(m_sensor, m_servo, m_kicker)
-                ));
+                );
 
         new Trigger(() -> MatchValues.robotState == MatchValues.RobotState.INTAKE)
                 .whenActive(new SequentialCommandGroup(
-                        new ShootStateCommand(m_intake, m_servo),
+                        new IntakeStateCommand(m_intake, m_servo),
                         new SorterIntakeCommand(m_sensor, m_servo)
                 ));
     }

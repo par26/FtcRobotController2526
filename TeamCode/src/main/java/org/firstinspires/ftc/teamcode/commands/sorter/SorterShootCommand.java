@@ -108,7 +108,9 @@ public class SorterShootCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_kicker.rest();
-        MatchValues.robotState = MatchValues.RobotState.INTAKE;
+        if (!interrupted) {
+            MatchValues.robotState = MatchValues.RobotState.INTAKE;
+        }
     }
 
     private SorterNode.NodeOption pickNextToShootMaxPoints() {
